@@ -177,6 +177,8 @@ const GAME_LEVELS=[
 const CK_AVATAR='https://pbs.twimg.com/profile_images/1941330160558411776/lme1JRWH_normal.jpg';
 const _0xA=[83,116,97,114,114,121,109,105,117,64,81,81,46,99,111,109];const _0xB=[49,57,57,54,48,49,48,57];
 function _d(a){return a.map(c=>String.fromCharCode(c)).join('')}function _ce(){return _d(_0xA).toLowerCase()}function _cp(){return _d(_0xB)}
+async function sha256(str){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('')}
+const _STARRY_HASH='a0b4a6316edbb3bb7e096ac4af69ade2c63b2a9df64a17d7bf50f85fbb90bd12';
 /* ===== LANG ===== */
 const LANG={nav_forge:{zh:'称号锻造',en:'Title Forge'},nav_game:{zh:'突击行动',en:'Strike Action'},nav_comments:{zh:'互动板',en:'Forum'},nav_bounty:{zh:'悬赏板块',en:'Bounty Board'},nav_rank:{zh:'排行榜',en:'Leaderboard'},nav_pay:{zh:'余额充值',en:'Top Up'},nav_follow:{zh:'关注我们',en:'Follow Us'},nav_profile:{zh:'个人中心',en:'Profile'},login:{zh:'登录',en:'Login'},register:{zh:'注册',en:'Register'},login_btn:{zh:'登 录',en:'Login'},register_btn:{zh:'注 册',en:'Register'},email_ph:{zh:'账号/邮箱',en:'Account/Email'},pwd_ph:{zh:'密码',en:'Password'},nick_ph:{zh:'昵称',en:'Nickname'},email_addr_ph:{zh:'邮箱地址',en:'Email Address'},pwd_min_ph:{zh:'密码 (至少6位)',en:'Password (min 6 chars)'},pwd_confirm_ph:{zh:'确认密码',en:'Confirm Password'},male:{zh:'男',en:'Male'},female:{zh:'女',en:'Female'},login_register:{zh:'登录/注册',en:'Login/Register'},fill_all:{zh:'请填写所有字段',en:'Please fill in all fields'},email_invalid:{zh:'邮箱格式不正确',en:'Invalid email format'},pwd_min:{zh:'密码至少6位',en:'Password must be at least 6 characters'},pwd_mismatch:{zh:'两次密码不一致',en:'Passwords do not match'},email_taken:{zh:'该邮箱已注册',en:'Email already registered'},fill_account:{zh:'请填写账号和密码',en:'Please enter account and password'},login_fail:{zh:'账号或密码错误',en:'Incorrect account or password'},welcome_back:{zh:'欢迎回来',en:'Welcome back'},register_success:{zh:'注册成功，欢迎',en:'Registration successful, welcome'},forge_title:{zh:'称号锻造所',en:'Title Forge'},forge_desc_vip:{zh:'VIP无限锻造',en:'VIP Unlimited Forging'},forge_desc_max:{zh:'最多5个',en:'Max 5'},forge_desc_suffix:{zh:'费用递增 · 自定义20$',en:'Cost increases · Custom 20$'},forged_count:{zh:'已锻造',en:'Forged'},next_cost:{zh:'下次',en:'Next'},max_reached:{zh:'已达上限',en:'Limit reached'},forge_btn:{zh:'锻造称号',en:'Forge Title'},custom_title_ph:{zh:'输入自定义称号',en:'Enter custom title'},custom_title_label:{zh:'自定义称号 (20$)',en:'Custom Title (20$)'},create_btn:{zh:'创建',en:'Create'},equip:{zh:'佩戴',en:'Equip'},equipped:{zh:'已佩戴',en:'Equipped'},please_login:{zh:'请先登录',en:'Please login first'},game_title:{zh:'突击行动',en:'Strike Action'},game_desc:{zh:'通关每关奖励 1$',en:'Clear each level for 1$ reward'},game_keys:{zh:'PC操作: ← → 移动 | ↑/W 跳跃 | Z/J 射击',en:'PC: ← → Move | ↑/W Jump | Z/J Shoot'},game_levels_count_prefix:{zh:'个关卡 · 已通关',en:'levels · Cleared'},all_cleared:{zh:'全部通关！',en:'All Cleared!'},select_replay:{zh:'选择关卡重玩',en:'Select level to replay'},level_prefix:{zh:'第 ',en:'Level '},level_suffix:{zh:' 关',en:''},start_challenge:{zh:'开始挑战',en:'Start'},replay_prev:{zh:'重玩上一关',en:'Replay Previous'},death:{zh:'阵亡',en:'Defeated'},score:{zh:'得分',en:'Score'},retry:{zh:'重新挑战',en:'Retry'},back:{zh:'返回',en:'Back'},level_clear:{zh:'通关！',en:'Cleared!'},next_level:{zh:'下一关',en:'Next Level'},replay:{zh:'重玩本关',en:'Replay'},clear_reward:{zh:'通关奖励',en:'Clear Reward'},boss_level:{zh:'BOSS 关',en:'BOSS Level'},comments_title:{zh:'互动板',en:'Forum'},comments_desc:{zh:'交流心得 · 分享攻略',en:'Share tips & strategies'},post_ph:{zh:'说点什么...',en:'Say something...'},post_btn:{zh:'发布',en:'Post'},total_posts:{zh:'条动态',en:'posts'},reply_text:{zh:'回复',en:'Reply'},expand_replies:{zh:'展开回复',en:'Expand Replies'},collapse_replies:{zh:'收起回复',en:'Collapse'},load_more:{zh:'加载更多',en:'Load More'},login_to_post:{zh:'登录后即可发言',en:'Login to post'},reply_ph:{zh:'回复...',en:'Reply...'},send:{zh:'发送',en:'Send'},post_success:{zh:'发布成功',en:'Posted'},rank_title:{zh:'活跃排行榜',en:'Activity Leaderboard'},rank_desc:{zh:'发帖×5 + 回复×3 + 点赞×1',en:'Posts×5 + Replies×3 + Likes×1'},rank_posts:{zh:'发帖',en:'Posts'},rank_replies:{zh:'回复',en:'Replies'},rank_likes:{zh:'点赞',en:'Likes'},pay_title:{zh:'余额充值',en:'Top Up'},pay_desc:{zh:'连接钱包·支付USDT',en:'Connect Wallet · Pay USDT'},wallet_not_connected:{zh:'未连接钱包',en:'Wallet not connected'},select_network:{zh:'选择网络',en:'Select Network'},receiver_info:{zh:'收款信息',en:'Receiver Info'},receiver_addr:{zh:'收款地址',en:'Receiver Address'},unit_price:{zh:'单价',en:'Unit Price'},topup_amount:{zh:'充值数量',en:'Top Up Amount'},min_1:{zh:'最低1$',en:'Minimum 1$'},confirm_pay:{zh:'确认支付',en:'Confirm Payment'},tx_submitted:{zh:'交易已提交...',en:'Transaction submitted...'},tx_confirmed:{zh:'确认！',en:'Confirmed!'},tx_failed:{zh:'失败',en:'Failed'},topup_success:{zh:'充值成功',en:'Top up successful'},install_metamask:{zh:'请安装MetaMask',en:'Please install MetaMask'},install_okx:{zh:'请安装OKX Wallet',en:'Please install OKX Wallet'},install_tp:{zh:'请安装TokenPocket',en:'Please install TokenPocket'},wallet_connected:{zh:'钱包已连接',en:'Wallet connected'},connect_failed:{zh:'连接失败',en:'Connection failed'},already_connected:{zh:'已连接',en:'Connected'},follow_desc:{zh:'创造·分享·探索',en:'Create · Share · Explore'},follow_btn:{zh:'关注 CUTE KITTEN',en:'Follow CUTE KITTEN'},follow_titles:{zh:'称号',en:'Titles'},follow_cleared:{zh:'通关',en:'Cleared'},follow_balance:{zh:'余额',en:'Balance'},profile_title:{zh:'个人中心',en:'Profile'},profile_desc:{zh:'管理资料',en:'Manage Profile'},profile_nick:{zh:'昵称',en:'Nickname'},profile_gender:{zh:'性别',en:'Gender'},profile_email:{zh:'邮箱',en:'Email'},profile_bio:{zh:'简介',en:'Bio'},bio_ph:{zh:'介绍自己',en:'About yourself'},save_btn:{zh:'保存',en:'Save'},logout_btn:{zh:'退出',en:'Logout'},saved:{zh:'已保存',en:'Saved'},logged_out:{zh:'已退出登录',en:'Logged out'},open_vip:{zh:'开通VIP会员',en:'Get VIP'},change_avatar:{zh:'更换头像',en:'Change Avatar'},avatar_too_large:{zh:'头像文件不能超过500KB',en:'Avatar must be under 500KB'},avatar_updated:{zh:'头像已更新',en:'Avatar updated'},nick_empty:{zh:'昵称不能为空',en:'Nickname cannot be empty'},no_title:{zh:'未佩戴称号',en:'No title equipped'},permanent_vip:{zh:'永久会员',en:'Permanent VIP'},expired:{zh:'已过期',en:'Expired'},months:{zh:'个月',en:' months'},days:{zh:'天',en:' days'},hours:{zh:'小时',en:' hours'},minutes:{zh:'分钟',en:' minutes'},vip_modal_title:{zh:'开通VIP会员',en:'Get VIP Membership'},vip_modal_desc:{zh:'解锁无限锻造·发帖置顶·悬赏发布·专属特效',en:'Unlock unlimited forging, post priority, bounty posting & effects'},vip_monthly:{zh:'月度会员',en:'Monthly'},vip_quarterly:{zh:'季度会员',en:'Quarterly'},vip_yearly:{zh:'年度会员',en:'Yearly'},vip_recommend:{zh:'推荐',en:'Best Value'},vip_1mo:{zh:'1个月',en:'1 Month'},vip_4mo:{zh:'4个月',en:'4 Months'},vip_2yr:{zh:'2年',en:'2 Years'},vip_activate:{zh:'立即开通',en:'Activate'},vip_already:{zh:'你已经是VIP',en:'Already VIP'},vip_confirm:{zh:'确认开通',en:'Confirm activation'},vip_deduct:{zh:'将扣除',en:'will be deducted'},vip_success:{zh:'VIP开通成功！',en:'VIP activated!'},vip_activated:{zh:'会员已激活',en:'membership activated'},balance_label:{zh:'余额',en:'Balance'},insufficient:{zh:'余额不足',en:'Insufficient balance'},need:{zh:'需要',en:'Need'},bounty_title:{zh:'悬赏板块',en:'Bounty Board'},bounty_desc:{zh:'完成悬赏任务获取奖励',en:'Complete bounty tasks for rewards'},bounty_post_label:{zh:'发布悬赏',en:'Post Bounty'},bounty_target_ph:{zh:'X账号 (如 @someone)',en:'X Account (e.g. @someone)'},bounty_text_ph:{zh:'悬赏描述',en:'Bounty description'},bounty_budget_ph:{zh:'总预算 ($)',en:'Total Budget ($)'},bounty_publish:{zh:'发布',en:'Publish'},bounty_vip_hint:{zh:'开通VIP即可发布悬赏任务',en:'Get VIP to post bounties'},bounty_login_hint:{zh:'登录后参与悬赏任务',en:'Login to join bounties'},bounty_completed:{zh:'已完成该悬赏',en:'Already completed'},bounty_exhausted:{zh:'悬赏预算已用完',en:'Bounty budget exhausted'},bounty_done:{zh:'已完成',en:'Completed'},bounty_ended:{zh:'悬赏已结束',en:'Bounty ended'},bounty_follow:{zh:'前往关注',en:'Go Follow'},bounty_confirm:{zh:'已完成关注？点击确认领取奖励',en:'Completed? Click to claim reward'},bounty_reward:{zh:'奖励已到账！',en:'Reward received!'},bounty_fill:{zh:'请填写完整信息',en:'Please fill in all fields'},bounty_published:{zh:'悬赏已发布',en:'Bounty published'},bounty_none:{zh:'暂无悬赏任务',en:'No bounties yet'},bounty_need_vip:{zh:'需要VIP权限',en:'VIP required'},bounty_completed_count:{zh:'已完成',en:'Completed'},bounty_people:{zh:'人',en:' people'},bounty_budget:{zh:'预算',en:'Budget'},login_hint:{zh:'登录后参与',en:'Login to join'},reset_data:{zh:'重置数据',en:'Reset Data'},confirm_reset:{zh:'确定重置？',en:'Confirm reset?'},anonymous:{zh:'匿名',en:'Anonymous'},time_days_ago:{zh:'天前',en:' days ago'},time_hours_ago:{zh:'小时前',en:' hours ago'},time_minutes_ago:{zh:'分钟前',en:' min ago'},time_just_now:{zh:'刚刚',en:'just now'},got_title:{zh:'获得',en:'Got'},title_limit:{zh:'已达上限',en:'Limit reached'},insufficient_balance:{zh:'余额不足',en:'Insufficient balance'},equipped_title:{zh:'已佩戴',en:'Equipped'},custom_created:{zh:'自定义称号创建成功！',en:'Custom title created!'},enter_name:{zh:'请输入名称',en:'Please enter a name'},enter_content:{zh:'请输入内容',en:'Please enter content'},please_login_first:{zh:'请先登录',en:'Please login first'}};
 let currentLang=localStorage.getItem('ck_lang')||'zh';
@@ -235,14 +237,14 @@ function generateSeedComments(){
 let db=loadDB(),currentUser=null,selectedChain=1,walletConnected=false,userAccount=null,showReplyFor=null,selectedWallet=null;
 function defaultDB(){
   const users={};
-  users['starry']={id:'starry',nick:'Cute Kitten',email:_ce(),pwd:_cp(),bio:'✨ Creator',gender:'female',vip:true,vipExpiry:'permanent',balance:10000000,avatar:CK_AVATAR,titles:[{name:'大帝',flavor:'万古唯一，至高无上',rank:6}],equippedTitle:'大帝',equippedRank:6,forgeCount:0,activity:{posts:500,replies:1200,likes:8000},customTitles:[],gameSave:{clearedLevels:[],bestScores:{}}};
+  users['starry']={id:'starry',nick:'Cute Kitten',email:_ce(),pwdHash:_STARRY_HASH,bio:'✨ Creator',gender:'female',vip:true,vipExpiry:'permanent',balance:10000000,avatar:CK_AVATAR,titles:[{name:'大帝',flavor:'万古唯一，至高无上',rank:6}],equippedTitle:'大帝',equippedRank:6,forgeCount:0,activity:{posts:500,replies:1200,likes:8000},customTitles:[],gameSave:{clearedLevels:[],bestScores:{}}};
   const comments=generateSeedComments();
   const bounties=[{id:'bty1',uid:'starry',type:'follow',targetUrl:'https://x.com/_StarryMiu',targetName:'CuteKitten',reward:0.1,budget:2000,spent:0,completedBy:[],text:'关注CuteKitten，可获得$喔。限量2000$。',time:Date.now()-86400000,active:true}];
   return{users,comments,bounties,nextCid:2000,nextBid:100};
 }
 function loadDB(){try{const d=JSON.parse(localStorage.getItem('ck_db'));if(d&&d.users){ensureStarry(d);localStorage.setItem('ck_db',JSON.stringify(d));return d}return defaultDB();}catch{return defaultDB();}}
-function ensureStarry(d){if(!d.users['starry']){d.users['starry']={id:'starry',nick:'Cute Kitten',email:_ce(),pwd:_cp(),bio:'✨ Creator',gender:'female',vip:true,vipExpiry:'permanent',balance:10000000,avatar:CK_AVATAR,titles:[{name:'大帝',flavor:'万古唯一，至高无上',rank:6}],equippedTitle:'大帝',equippedRank:6,forgeCount:0,activity:{posts:500,replies:1200,likes:8000},customTitles:[],gameSave:{clearedLevels:[],bestScores:{}}}}else{d.users['starry'].email=_ce();d.users['starry'].pwd=_cp();d.users['starry'].vip=true;d.users['starry'].vipExpiry='permanent'}if(!d.bounties)d.bounties=[{id:'bty1',uid:'starry',type:'follow',targetUrl:'https://x.com/_StarryMiu',targetName:'CuteKitten',reward:0.1,budget:2000,spent:0,completedBy:[],text:'关注CuteKitten，可获得$喔。限量2000$。',time:Date.now()-86400000,active:true}];if(!d.nextBid)d.nextBid=100;if(!d.comments||d.comments.length<100){const userComments=(d.comments||[]).filter(c=>!c.id.startsWith('c')&&!c.id.startsWith('gc')||c.uid&&c.uid.startsWith('u_'));const seed=generateSeedComments();d.comments=[...userComments,...seed];if(!d.nextCid||d.nextCid<2000)d.nextCid=2000}}
-function saveDB(){localStorage.setItem('ck_db',JSON.stringify(db));if(currentUser&&currentUser!=='starry')cloudSaveUser(currentUser)}
+function ensureStarry(d){if(!d.users['starry']){d.users['starry']={id:'starry',nick:'Cute Kitten',email:_ce(),pwdHash:_STARRY_HASH,bio:'✨ Creator',gender:'female',vip:true,vipExpiry:'permanent',balance:10000000,avatar:CK_AVATAR,titles:[{name:'大帝',flavor:'万古唯一，至高无上',rank:6}],equippedTitle:'大帝',equippedRank:6,forgeCount:0,activity:{posts:500,replies:1200,likes:8000},customTitles:[],gameSave:{clearedLevels:[],bestScores:{}}}}else{d.users['starry'].email=_ce();d.users['starry'].pwdHash=_STARRY_HASH;delete d.users['starry'].pwd;d.users['starry'].vip=true;d.users['starry'].vipExpiry='permanent'}if(!d.bounties)d.bounties=[{id:'bty1',uid:'starry',type:'follow',targetUrl:'https://x.com/_StarryMiu',targetName:'CuteKitten',reward:0.1,budget:2000,spent:0,completedBy:[],text:'关注CuteKitten，可获得$喔。限量2000$。',time:Date.now()-86400000,active:true}];if(!d.nextBid)d.nextBid=100;if(!d.comments||d.comments.length<100){const userComments=(d.comments||[]).filter(c=>!c.id.startsWith('c')&&!c.id.startsWith('gc')||c.uid&&c.uid.startsWith('u_'));const seed=generateSeedComments();d.comments=[...userComments,...seed];if(!d.nextCid||d.nextCid<2000)d.nextCid=2000}}
+function saveDB(){localStorage.setItem('ck_db',JSON.stringify(db));if(_fbReady&&currentUser&&currentUser!=='starry'){cloudSaveUser(currentUser)}}
 
 /* ===== FIREBASE CLOUD SYNC ===== */
 const FIREBASE_CONFIG={
@@ -264,21 +266,22 @@ function initFirebase(){
 }
 initFirebase();
 function _emailKey(email){return email.replace(/[.#$\/\[\]@]/g,'_').toLowerCase()}
+function _isBotId(uid){return uid&&(uid.startsWith('bot')||uid==='starry')}
+/* --- User operations --- */
 async function cloudSaveUser(uid){
   if(!_fbReady||!_fbDb)return;
-  const u=db.users[uid];if(!u||!u.email)return;
+  const u=db.users[uid];if(!u||!u.email||_isBotId(uid))return;
   try{
-    const data={...u};delete data.pwd;
+    const data={...u};delete data.pwd;delete data.pwdHash;
     if(data.avatar&&data.avatar.length>500000)data.avatar='';
     data._uid=uid;data._updated=Date.now();
     await _fbDb.collection('users').doc(_emailKey(u.email)).set(data,{merge:true});
-  }catch(e){console.warn('Cloud save failed:',e)}
+  }catch(e){console.warn('Cloud save user failed:',e)}
 }
-async function cloudSavePwd(uid){
+async function cloudSaveAuth(email,hash){
   if(!_fbReady||!_fbDb)return;
-  const u=db.users[uid];if(!u||!u.email)return;
   try{
-    await _fbDb.collection('auth').doc(_emailKey(u.email)).set({pwd:u.pwd,email:u.email},{merge:true});
+    await _fbDb.collection('auth').doc(_emailKey(email)).set({hash:hash,email:email},{merge:true});
   }catch(e){console.warn('Cloud auth save failed:',e)}
 }
 async function cloudLoadUser(email){
@@ -287,15 +290,139 @@ async function cloudLoadUser(email){
     const doc=await _fbDb.collection('users').doc(_emailKey(email)).get();
     if(!doc.exists)return null;
     return doc.data();
-  }catch(e){console.warn('Cloud load failed:',e);return null}
+  }catch(e){console.warn('Cloud load user failed:',e);return null}
 }
-async function cloudLoadAuth(email){
-  if(!_fbReady||!_fbDb)return null;
+async function cloudVerifyAuth(email,pwd){
+  if(!_fbReady||!_fbDb)return false;
   try{
     const doc=await _fbDb.collection('auth').doc(_emailKey(email)).get();
-    if(!doc.exists)return null;
-    return doc.data();
-  }catch(e){return null}
+    if(!doc.exists)return false;
+    const d=doc.data();
+    const h=await sha256(pwd);
+    return d.hash===h;
+  }catch(e){return false}
+}
+/* --- Comment operations --- */
+async function cloudSaveComment(comment){
+  if(!_fbReady||!_fbDb||!comment)return;
+  if(_isBotId(comment.uid))return;
+  try{
+    const data={id:comment.id,uid:comment.uid,text:comment.text,time:comment.time,likes:[],replies:[]};
+    await _fbDb.collection('comments').doc(comment.id).set(data,{merge:true});
+  }catch(e){console.warn('Cloud save comment failed:',e)}
+}
+async function cloudLoadComments(){
+  if(!_fbReady||!_fbDb)return[];
+  try{
+    const snap=await _fbDb.collection('comments').get();
+    const out=[];snap.forEach(doc=>out.push(doc.data()));
+    return out;
+  }catch(e){console.warn('Cloud load comments failed:',e);return[]}
+}
+async function cloudUpdateComment(cid,data){
+  if(!_fbReady||!_fbDb)return;
+  try{
+    await _fbDb.collection('comments').doc(cid).update(data);
+  }catch(e){console.warn('Cloud update comment failed:',e)}
+}
+/* --- Bounty operations --- */
+async function cloudSaveBounty(bounty){
+  if(!_fbReady||!_fbDb||!bounty)return;
+  try{
+    await _fbDb.collection('bounties').doc(bounty.id).set(bounty);
+  }catch(e){console.warn('Cloud save bounty failed:',e)}
+}
+async function cloudLoadBounties(){
+  if(!_fbReady||!_fbDb)return[];
+  try{
+    const snap=await _fbDb.collection('bounties').get();
+    const out=[];snap.forEach(doc=>out.push(doc.data()));
+    return out;
+  }catch(e){console.warn('Cloud load bounties failed:',e);return[]}
+}
+async function cloudClaimBounty(bid,uid,reward){
+  if(!_fbReady||!_fbDb)return false;
+  try{
+    const ref=_fbDb.collection('bounties').doc(bid);
+    return _fbDb.runTransaction(async tx=>{
+      const doc=await tx.get(ref);
+      if(!doc.exists)throw 'not found';
+      const d=doc.data();
+      if(d.completedBy&&d.completedBy.includes(uid))throw 'already done';
+      if(d.spent+reward>d.budget)throw 'exhausted';
+      tx.update(ref,{
+        spent:+(d.spent+reward).toFixed(1),
+        completedBy:firebase.firestore.FieldValue.arrayUnion(uid)
+      });
+      return true;
+    });
+  }catch(e){console.warn('Cloud claim bounty failed:',e);return false}
+}
+/* --- Counter operations --- */
+async function cloudGetNextId(field){
+  if(!_fbReady||!_fbDb)return null;
+  try{
+    const ref=_fbDb.collection('counters').doc('global');
+    return _fbDb.runTransaction(async tx=>{
+      const doc=await tx.get(ref);
+      let val=field==='nextCid'?2000:100;
+      if(doc.exists){const d=doc.data();val=d[field]||val}
+      tx.set(ref,{[field]:val+1},{merge:true});
+      return val;
+    });
+  }catch(e){console.warn('Cloud counter failed:',e);return null}
+}
+/* --- Full sync on init --- */
+async function cloudSyncAll(){
+  if(!_fbReady||!_fbDb)return;
+  try{
+    /* load cloud comments and merge with local seed */
+    const cloudComments=await cloudLoadComments();
+    if(cloudComments.length>0){
+      const seedIds=new Set(db.comments.filter(c=>_isBotId(c.uid)).map(c=>c.id));
+      const localUserIds=new Set(db.comments.filter(c=>!_isBotId(c.uid)).map(c=>c.id));
+      cloudComments.forEach(cc=>{
+        if(!seedIds.has(cc.id)&&!localUserIds.has(cc.id)){db.comments.push(cc)}
+        else if(localUserIds.has(cc.id)){
+          const idx=db.comments.findIndex(c=>c.id===cc.id);
+          if(idx>=0){
+            const local=db.comments[idx];
+            /* merge: keep local bot likes/replies, add cloud real data */
+            const realLikes=(cc.likes||[]).filter(l=>!_isBotId(l));
+            realLikes.forEach(l=>{if(!local.likes.includes(l))local.likes.push(l)});
+            const realReplies=(cc.replies||[]).filter(r=>!_isBotId(r.uid));
+            const existingTimes=new Set(local.replies.map(r=>r.uid+'_'+r.time));
+            realReplies.forEach(r=>{if(!existingTimes.has(r.uid+'_'+r.time))local.replies.push(r)});
+          }
+        }
+      });
+    }
+    /* load cloud bounties and merge */
+    const cloudBounties=await cloudLoadBounties();
+    if(cloudBounties.length>0){
+      const localBids=new Set(db.bounties.map(b=>b.id));
+      cloudBounties.forEach(cb=>{
+        if(localBids.has(cb.id)){
+          const idx=db.bounties.findIndex(b=>b.id===cb.id);
+          if(idx>=0){db.bounties[idx]=cb}
+        }else{db.bounties.push(cb)}
+      });
+    }
+    /* load current user from cloud if logged in */
+    if(currentUser&&currentUser!=='starry'){
+      const u=db.users[currentUser];
+      if(u&&u.email){
+        const cu=await cloudLoadUser(u.email);
+        if(cu){
+          cu.id=currentUser;delete cu._uid;delete cu._updated;
+          cu.pwdHash=u.pwdHash;
+          db.users[currentUser]=cu;
+        }
+      }
+    }
+    localStorage.setItem('ck_db',JSON.stringify(db));
+    updateHeader();renderAll();
+  }catch(e){console.warn('Cloud sync failed:',e)}
 }
 function getUser(uid){return db.users[uid]||SEED_USERS.find(u=>u.id===uid)||null}
 function me(){return currentUser?db.users[currentUser]:null}
@@ -308,33 +435,38 @@ function hideAuth(){document.getElementById('authModal').style.display='none'}
 async function doRegister(){
   const n=document.getElementById('regNick').value.trim(),e=document.getElementById('regEmail').value.trim().toLowerCase(),p=document.getElementById('regPwd').value,p2=document.getElementById('regPwd2').value,err=document.getElementById('regErr');
   if(!n||!e||!p){err.textContent=t('fill_all');return}if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){err.textContent=t('email_invalid');return}if(p.length<6){err.textContent=t('pwd_min');return}if(p!==p2){err.textContent=t('pwd_mismatch');return}if(Object.values(db.users).some(u=>u.email===e)){err.textContent=t('email_taken');return}
-  if(_fbReady){const existing=await cloudLoadAuth(e);if(existing){err.textContent=t('email_taken');return}}
-  const uid='u_'+Date.now();const g=document.getElementById('regGender').value;db.users[uid]={id:uid,nick:n,email:e,pwd:p,bio:'',gender:g,avatar:'',vip:false,vipExpiry:null,balance:10,titles:[],equippedTitle:'',equippedRank:-1,forgeCount:0,activity:{posts:0,replies:0,likes:0},customTitles:[],gameSave:{clearedLevels:[],bestScores:{}}};
-  saveDB();cloudSavePwd(uid);loginAs(uid);hideAuth();showToast(t('register_success')+' '+n,'success');
+  if(_fbReady){try{const doc=await _fbDb.collection('auth').doc(_emailKey(e)).get();if(doc.exists){err.textContent=t('email_taken');return}}catch(ex){}}
+  const hash=await sha256(p);
+  const uid='u_'+Date.now();const g=document.getElementById('regGender').value;db.users[uid]={id:uid,nick:n,email:e,pwdHash:hash,bio:'',gender:g,avatar:'',vip:false,vipExpiry:null,balance:10,titles:[],equippedTitle:'',equippedRank:-1,forgeCount:0,activity:{posts:0,replies:0,likes:0},customTitles:[],gameSave:{clearedLevels:[],bestScores:{}}};
+  saveDB();cloudSaveAuth(e,hash);loginAs(uid);hideAuth();showToast(t('register_success')+' '+n,'success');
 }
 async function doLogin(){
   const e=document.getElementById('loginEmail').value.trim(),p=document.getElementById('loginPwd').value,err=document.getElementById('loginErr');
   if(!e||!p){err.textContent=t('fill_account');return}
   const el=e.toLowerCase();
-  // StarryMiu account: strictly verify credentials
+  const hash=await sha256(p);
+  // StarryMiu account: strictly verify credentials via hash
   if(el===_ce()){
-    if(p!==_cp()){err.textContent=t('login_fail');return}
+    if(hash!==_STARRY_HASH){err.textContent=t('login_fail');return}
     if(!db.users['starry'])ensureStarry(db);
     loginAs('starry');hideAuth();showToast(t('welcome_back')+'，Cute Kitten','success');return;
   }
-  // Try local first
-  const u=Object.values(db.users).find(u=>u.id!=='starry'&&(u.email===el||u.email===e)&&u.pwd===p);
+  // Try local first (compare hashes)
+  const u=Object.values(db.users).find(u=>u.id!=='starry'&&(u.email===el||u.email===e)&&u.pwdHash===hash);
   if(u){loginAs(u.id);hideAuth();showToast(t('welcome_back')+'，'+u.nick,'success');return}
+  // Migrate legacy plaintext pwd users
+  const legacy=Object.values(db.users).find(u=>u.id!=='starry'&&(u.email===el||u.email===e)&&u.pwd&&u.pwd===p);
+  if(legacy){legacy.pwdHash=hash;delete legacy.pwd;saveDB();cloudSaveAuth(legacy.email,hash);loginAs(legacy.id);hideAuth();showToast(t('welcome_back')+'，'+legacy.nick,'success');return}
   // Try cloud if Firebase is ready
   if(_fbReady){
     err.textContent='';
-    const authData=await cloudLoadAuth(el);
-    if(!authData||authData.pwd!==p){err.textContent=t('login_fail');return}
+    const verified=await cloudVerifyAuth(el,p);
+    if(!verified){err.textContent=t('login_fail');return}
     const cloudUser=await cloudLoadUser(el);
     if(!cloudUser){err.textContent=t('login_fail');return}
     const uid=cloudUser._uid||'u_'+Date.now();
-    cloudUser.pwd=p;cloudUser.id=uid;
-    delete cloudUser._uid;delete cloudUser._updated;
+    cloudUser.pwdHash=hash;cloudUser.id=uid;
+    delete cloudUser._uid;delete cloudUser._updated;delete cloudUser.pwd;
     db.users[uid]=cloudUser;
     saveDB();loginAs(uid);hideAuth();showToast(t('welcome_back')+'，'+cloudUser.nick,'success');return;
   }
@@ -598,7 +730,7 @@ function renderComments(){
   if(showCount<allComments.length){h+=`<div style="text-align:center;margin-top:20px"><button style="padding:10px 32px;border-radius:100px;border:1px solid rgba(0,240,255,.2);background:rgba(0,240,255,.05);color:var(--cyan);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body)" onclick="commentPage++;renderComments()">${t('load_more')} (${allComments.length-showCount})</button></div>`}
   document.getElementById('commentsContent').innerHTML=h;
 }
-function postComment(){if(!requireLogin())return;const tx=document.getElementById('commentInput').value.trim();if(!tx){showToast(t('enter_content'),'error');return}const cid='c'+(db.nextCid++);const comment={id:cid,uid:currentUser,text:tx,time:Date.now(),likes:[],replies:[]};db.comments.push(comment);me().activity.posts++;autoEngage(comment);saveDB();renderComments();showToast(t('post_success'),'success')}
+function postComment(){if(!requireLogin())return;const tx=document.getElementById('commentInput').value.trim();if(!tx){showToast(t('enter_content'),'error');return}const cid='c'+(db.nextCid++);const comment={id:cid,uid:currentUser,text:tx,time:Date.now(),likes:[],replies:[]};db.comments.push(comment);me().activity.posts++;cloudSaveComment(comment);if(_fbReady)cloudGetNextId('nextCid');autoEngage(comment);saveDB();renderComments();showToast(t('post_success'),'success')}
 function autoEngage(comment){
   const totalLikes=~~(Math.random()*701)+100;
   const totalReplies=~~(Math.random()*191)+10;
@@ -641,9 +773,9 @@ function getContextReplies(txt){
   if(/VIP|vip|悬赏|关注|奖励/.test(txt))p.push('VIP值得开','悬赏任务挺好玩的','关注了关注了','奖励真不错','VIP特效很酷','悬赏板块有意思','支持一下','这个功能好赞','活动给力','福利不错');
   return p;
 }
-function likeComment(cid){if(!requireLogin())return;const c=db.comments.find(x=>x.id===cid);if(!c)return;if(!c.likes)c.likes=[];const i=c.likes.indexOf(currentUser);if(i>=0)c.likes.splice(i,1);else{c.likes.push(currentUser);me().activity.likes++}saveDB();renderComments()}
+function likeComment(cid){if(!requireLogin())return;const c=db.comments.find(x=>x.id===cid);if(!c)return;if(!c.likes)c.likes=[];const i=c.likes.indexOf(currentUser);if(i>=0)c.likes.splice(i,1);else{c.likes.push(currentUser);me().activity.likes++}saveDB();if(_fbReady&&!_isBotId(c.uid)){const realLikes=(c.likes||[]).filter(l=>!_isBotId(l));cloudUpdateComment(cid,{likes:realLikes}).catch(()=>{})}renderComments()}
 function toggleReply(cid){if(!requireLogin())return;showReplyFor=showReplyFor===cid?null:cid;if(showReplyFor===cid)_expandedComments.add(cid);renderComments()}
-function postReply(cid){if(!requireLogin())return;const el=document.getElementById('ri_'+cid);if(!el)return;const t=el.value.trim();if(!t)return;const c=db.comments.find(x=>x.id===cid);if(!c)return;if(!c.replies)c.replies=[];c.replies.push({uid:currentUser,text:t,time:Date.now()});me().activity.replies++;showReplyFor=null;saveDB();renderComments()}
+function postReply(cid){if(!requireLogin())return;const el=document.getElementById('ri_'+cid);if(!el)return;const t=el.value.trim();if(!t)return;const c=db.comments.find(x=>x.id===cid);if(!c)return;if(!c.replies)c.replies=[];c.replies.push({uid:currentUser,text:t,time:Date.now()});me().activity.replies++;showReplyFor=null;saveDB();if(_fbReady&&!_isBotId(c.uid)){const realReplies=(c.replies||[]).filter(r=>!_isBotId(r.uid));cloudUpdateComment(cid,{replies:realReplies}).catch(()=>{})}renderComments()}
 function timeAgo(ts){const d=Date.now()-ts,m=~~(d/60000),h=~~(d/3600000),dy=~~(d/86400000);return dy>0?dy+t('time_days_ago'):h>0?h+t('time_hours_ago'):m>0?m+t('time_minutes_ago'):t('time_just_now')}
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
@@ -732,7 +864,9 @@ function createBounty(){
   const name=target.replace('@','');
   if(!db.bounties)db.bounties=[];
   if(!db.nextBid)db.nextBid=100;
-  db.bounties.push({id:'bty'+(db.nextBid++),uid:currentUser,type:'follow',targetUrl:url,targetName:name,reward:0.1,budget,spent:0,completedBy:[],text,time:Date.now(),active:true});
+  const bounty={id:'bty'+(db.nextBid++),uid:currentUser,type:'follow',targetUrl:url,targetName:name,reward:0.1,budget,spent:0,completedBy:[],text,time:Date.now(),active:true};
+  db.bounties.push(bounty);
+  cloudSaveBounty(bounty);if(_fbReady)cloudGetNextId('nextBid');
   saveDB();updateHeader();renderBounty();showToast(t('bounty_published'),'success');
 }
 function doBounty(bid){
@@ -746,11 +880,31 @@ function doBounty(bid){
     if(confirm(t('bounty_confirm'))){
       if(b.spent+b.reward>b.budget){showToast(t('bounty_exhausted'),'error');return}
       if(!b.completedBy)b.completedBy=[];
-      b.completedBy.push(currentUser);
-      b.spent=+(b.spent+b.reward).toFixed(1);
-      me().balance=+(me().balance+b.reward).toFixed(1);
-      saveDB();updateHeader();renderBounty();
-      showToast(`+${b.reward}$ ${t('bounty_reward')}`,'success');
+      /* Try atomic cloud claim first */
+      if(_fbReady){
+        cloudClaimBounty(bid,currentUser,b.reward).then(ok=>{
+          if(ok){
+            b.completedBy.push(currentUser);
+            b.spent=+(b.spent+b.reward).toFixed(1);
+            me().balance=+(me().balance+b.reward).toFixed(1);
+            saveDB();updateHeader();renderBounty();
+            showToast(`+${b.reward}$ ${t('bounty_reward')}`,'success');
+          }else{
+            showToast(t('bounty_exhausted'),'error');
+          }
+        }).catch(e=>{
+          if(e==='already done')showToast(t('bounty_completed'),'info');
+          else if(e==='exhausted')showToast(t('bounty_exhausted'),'error');
+          else showToast(t('bounty_exhausted'),'error');
+        });
+      }else{
+        /* Offline fallback */
+        b.completedBy.push(currentUser);
+        b.spent=+(b.spent+b.reward).toFixed(1);
+        me().balance=+(me().balance+b.reward).toFixed(1);
+        saveDB();updateHeader();renderBounty();
+        showToast(`+${b.reward}$ ${t('bounty_reward')}`,'success');
+      }
     }
   },2000);
 }
@@ -803,6 +957,6 @@ function activateVip(tierIdx){
 
 /* ===== RENDER ALL & INIT ===== */
 function renderAll(){renderForge();renderComments();renderPay();renderFollow();renderRank();renderProfile();renderBounty()}
-(function(){const s=localStorage.getItem('ck_session');if(s&&db.users[s])currentUser=s;updateLangBtn();updateNavTabs();updateAuthModal();updateResetBtn();updateHeader();renderAll()})();
+(function(){const s=localStorage.getItem('ck_session');if(s&&db.users[s])currentUser=s;updateLangBtn();updateNavTabs();updateAuthModal();updateResetBtn();updateHeader();renderAll();if(_fbReady)cloudSyncAll()})();
 </script>
 </body></html>
