@@ -253,6 +253,7 @@ function generateSeedComments(){
 }
 
 /* ===== STATE ===== */
+const _SEED_VERSION=3; /* bump this to force all devices to regenerate seed data */
 let db=loadDB(),currentUser=null,selectedChain=1,walletConnected=false,userAccount=null,showReplyFor=null,selectedWallet=null;
 function defaultDB(){
   const users={};
@@ -260,10 +261,28 @@ function defaultDB(){
   _initTestAccounts(users);
   const comments=generateSeedComments();
   const bounties=[{id:'bty1',uid:'starry',type:'follow',targetUrl:'https://x.com/_StarryMiu',targetName:'CuteKitten',reward:0.1,budget:2000,spent:0,completedBy:[],text:'关注CuteKitten，可获得$喔。限量2000$。',time:Date.now()-86400000,active:true}];
-  return{users,comments,bounties,nextCid:2000,nextBid:100};
+  return{users,comments,bounties,nextCid:2000,nextBid:100,_seedVersion:_SEED_VERSION};
 }
-function loadDB(){try{const d=JSON.parse(localStorage.getItem('ck_db'));if(d&&d.users){ensureStarry(d);localStorage.setItem('ck_db',JSON.stringify(d));return d}return defaultDB();}catch{return defaultDB();}}
-function ensureStarry(d){if(!d.users['starry']){d.users['starry']={id:'starry',nick:'Cute Kitten',email:_ce(),pwdHash:_STARRY_HASH,bio:'✨ Creator',gender:'female',vip:true,vipExpiry:'permanent',balance:10000000,avatar:CK_AVATAR,titles:[{name:'大帝',flavor:'万古唯一，至高无上',rank:6}],equippedTitle:'大帝',equippedRank:6,forgeCount:0,activity:{posts:500,replies:1200,likes:8000},customTitles:[],gameSave:{clearedLevels:[],bestScores:{}}}}else{d.users['starry'].email=_ce();d.users['starry'].pwdHash=_STARRY_HASH;delete d.users['starry'].pwd;d.users['starry'].vip=true;d.users['starry'].vipExpiry='permanent'}_initTestAccounts(d.users);if(!d.bounties)d.bounties=[{id:'bty1',uid:'starry',type:'follow',targetUrl:'https://x.com/_StarryMiu',targetName:'CuteKitten',reward:0.1,budget:2000,spent:0,completedBy:[],text:'关注CuteKitten，可获得$喔。限量2000$。',time:Date.now()-86400000,active:true}];if(!d.nextBid)d.nextBid=100;const hasSeedComments=d.comments&&d.comments.some(c=>c.id==='c0');if(!hasSeedComments){const userComments=(d.comments||[]).filter(c=>(c.uid&&!c.uid.startsWith('bot'))||c.id.startsWith('p_'));const seed=generateSeedComments();d.comments=[...userComments,...seed];if(!d.nextCid||d.nextCid<2000)d.nextCid=2000}}
+function loadDB(){
+  try{
+    const d=JSON.parse(localStorage.getItem('ck_db'));
+    if(d&&d.users){
+      /* If seed version changed, force regenerate seeds but keep user posts and registered users */
+      if(d._seedVersion!==_SEED_VERSION){
+        const userComments=(d.comments||[]).filter(c=>c.id&&c.id.startsWith('p_'));
+        const seed=generateSeedComments();
+        d.comments=[...userComments,...seed];
+        d._seedVersion=_SEED_VERSION;
+        /* Keep registered (non-bot, non-test, non-starry) users */
+      }
+      ensureStarry(d);
+      localStorage.setItem('ck_db',JSON.stringify(d));
+      return d;
+    }
+    return defaultDB();
+  }catch{return defaultDB();}
+}
+function ensureStarry(d){if(!d.users['starry']){d.users['starry']={id:'starry',nick:'Cute Kitten',email:_ce(),pwdHash:_STARRY_HASH,bio:'✨ Creator',gender:'female',vip:true,vipExpiry:'permanent',balance:10000000,avatar:CK_AVATAR,titles:[{name:'大帝',flavor:'万古唯一，至高无上',rank:6}],equippedTitle:'大帝',equippedRank:6,forgeCount:0,activity:{posts:500,replies:1200,likes:8000},customTitles:[],gameSave:{clearedLevels:[],bestScores:{}}}}else{d.users['starry'].email=_ce();d.users['starry'].pwdHash=_STARRY_HASH;delete d.users['starry'].pwd;d.users['starry'].vip=true;d.users['starry'].vipExpiry='permanent'}_initTestAccounts(d.users);if(!d.bounties)d.bounties=[{id:'bty1',uid:'starry',type:'follow',targetUrl:'https://x.com/_StarryMiu',targetName:'CuteKitten',reward:0.1,budget:2000,spent:0,completedBy:[],text:'关注CuteKitten，可获得$喔。限量2000$。',time:Date.now()-86400000,active:true}];if(!d.nextBid)d.nextBid=100;if(!d.nextCid||d.nextCid<2000)d.nextCid=2000}
 function saveDB(){localStorage.setItem('ck_db',JSON.stringify(db));if(_fbReady&&currentUser){cloudSaveUser(currentUser)}}
 
 /* ===== FIREBASE CLOUD SYNC ===== */
@@ -419,10 +438,14 @@ async function cloudSaveCommentFull(comment){
 async function cloudLoadComments(){
   if(!_fbReady||!_fbDb)return[];
   try{
-    const snap=await _fbDb.collection('comments').get();
+    const snap=await _fbDb.collection('comments').get({source:'server'});
     const out=[];snap.forEach(doc=>out.push(doc.data()));
     return out;
-  }catch(e){console.warn('Cloud load comments failed:',e);return[]}
+  }catch(e){
+    /* Fallback to default (possibly cached) if server fetch fails */
+    console.warn('Cloud load comments from server failed, trying default:',e);
+    try{const snap=await _fbDb.collection('comments').get();const out=[];snap.forEach(doc=>out.push(doc.data()));return out}catch(e2){console.warn('Cloud load comments failed:',e2);return[]}
+  }
 }
 async function cloudUpdateComment(cid,data){
   if(!_fbReady||!_fbDb)return;
@@ -903,7 +926,7 @@ function _renderCommentsUI(){
   if(showCount<allComments.length){h+=`<div style="text-align:center;margin-top:20px"><button style="padding:10px 32px;border-radius:100px;border:1px solid rgba(0,240,255,.2);background:rgba(0,240,255,.05);color:var(--cyan);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body)" onclick="commentPage++;renderComments()">${t('load_more')} (${allComments.length-showCount})</button></div>`}
   document.getElementById('commentsContent').innerHTML=h;
 }
-function postComment(){if(!requireLogin())return;const tx=document.getElementById('commentInput').value.trim();if(!tx){showToast(t('enter_content'),'error');return}const cid='p_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);const comment={id:cid,uid:currentUser,text:tx,time:Date.now(),likes:[],replies:[]};db.comments.push(comment);me().activity.posts++;cloudSaveComment(comment);autoEngage(comment);saveDB();commentPage=0;_renderCommentsUI();document.getElementById('sectionComments').scrollIntoView({behavior:'smooth',block:'start'});showToast(t('post_success'),'success')}
+async function postComment(){if(!requireLogin())return;const tx=document.getElementById('commentInput').value.trim();if(!tx){showToast(t('enter_content'),'error');return}const cid='p_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);const comment={id:cid,uid:currentUser,text:tx,time:Date.now(),likes:[],replies:[]};db.comments.push(comment);me().activity.posts++;saveDB();commentPage=0;_renderCommentsUI();document.getElementById('sectionComments').scrollIntoView({behavior:'smooth',block:'start'});showToast(t('post_success'),'success');/* Save to cloud with retry */try{await cloudSaveComment(comment)}catch(e){console.warn('Initial cloud save failed, retrying...',e);try{await cloudSaveComment(comment)}catch(e2){console.warn('Cloud save retry also failed:',e2)}}autoEngage(comment)}
 function autoEngage(comment,skipCloudSave){
   const posterIsVip=isVipPost(comment.uid);
   /* VIP: 3000-30000 likes, 1000-10000 replies */
@@ -1178,7 +1201,24 @@ function activateVip(tierIdx){
 }
 
 /* ===== RENDER ALL & INIT ===== */
-function renderAll(){renderForge();renderComments();renderPay();renderFollow();renderRank();renderProfile();renderBounty()}
-(function(){const s=localStorage.getItem('ck_session');if(s&&db.users[s])currentUser=s;updateLangBtn();updateNavTabs();updateAuthModal();updateResetBtn();updateHeader();renderAll();if(_fbReady){setupRealtimeListeners();cloudSyncAll().then(()=>{renderComments();renderBounty();renderRank()}).catch(()=>{})}})();
+function renderAll(){renderForge();renderComments(true);renderPay();renderFollow();renderRank();renderProfile();renderBounty()}
+async function _doCloudSync(){
+  if(!_fbReady||!_fbDb)return;
+  try{
+    setupRealtimeListeners();
+    await cloudSyncAll();
+    renderComments(true);renderBounty();renderRank();
+  }catch(e){console.warn('Cloud sync error:',e)}
+}
+(function(){
+  const s=localStorage.getItem('ck_session');
+  if(s&&db.users[s])currentUser=s;
+  updateLangBtn();updateNavTabs();updateAuthModal();updateResetBtn();updateHeader();
+  renderAll();
+  if(_fbReady){_doCloudSync()}
+  else{/* Retry cloud sync after 2s in case Firebase was slow to init */
+    setTimeout(()=>{if(!_fbReady){initFirebase()}if(_fbReady){_doCloudSync()}},2000);
+  }
+})();
 </script>
 </body></html>
