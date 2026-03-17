@@ -340,6 +340,32 @@ async function cloudLoadBounties(){
     return out;
   }catch(e){console.warn('Cloud load bounties failed:',e);return[]}
 }
+/* Refresh bounties from cloud and merge into local db */
+async function cloudSyncBounties(){
+  if(!_fbReady||!_fbDb)return;
+  try{
+    const cloudBounties=await cloudLoadBounties();
+    if(cloudBounties.length>0){
+      cloudBounties.forEach(cb=>{
+        const idx=db.bounties.findIndex(b=>b.id===cb.id);
+        if(idx>=0){
+          /* Cloud is authoritative for completedBy and spent */
+          db.bounties[idx].completedBy=cb.completedBy||[];
+          db.bounties[idx].spent=cb.spent||0;
+          db.bounties[idx].active=cb.active!==undefined?cb.active:true;
+        }else{
+          db.bounties.push(cb);
+        }
+      });
+    }
+    /* Ensure all local bounties exist in cloud */
+    for(const b of db.bounties){
+      const exists=cloudBounties.some(cb=>cb.id===b.id);
+      if(!exists){await cloudSaveBounty(b)}
+    }
+    localStorage.setItem('ck_db',JSON.stringify(db));
+  }catch(e){console.warn('Cloud sync bounties failed:',e)}
+}
 async function cloudClaimBounty(bid,uid,reward){
   if(!_fbReady||!_fbDb)return false;
   try{
@@ -400,16 +426,7 @@ async function cloudSyncAll(){
       });
     }
     /* load cloud bounties and merge */
-    const cloudBounties=await cloudLoadBounties();
-    if(cloudBounties.length>0){
-      const localBids=new Set(db.bounties.map(b=>b.id));
-      cloudBounties.forEach(cb=>{
-        if(localBids.has(cb.id)){
-          const idx=db.bounties.findIndex(b=>b.id===cb.id);
-          if(idx>=0){db.bounties[idx]=cb}
-        }else{db.bounties.push(cb)}
-      });
-    }
+    await cloudSyncBounties();
     /* load current user from cloud if logged in */
     if(currentUser&&currentUser!=='starry'){
       const u=db.users[currentUser];
@@ -818,7 +835,24 @@ function handleAvatarUpload(input){if(!input.files||!input.files[0])return;const
 function saveProfile(){if(!requireLogin())return;const u=me(),n=document.getElementById('profNick').value.trim(),b=document.getElementById('profBio').value.trim(),g=document.getElementById('profGender').value;if(!n){showToast(t('nick_empty'),'error');return}u.nick=n;u.bio=b;u.gender=g;saveDB();updateHeader();renderProfile();showToast(t('saved'),'success')}
 
 /* ===== BOUNTY SYSTEM ===== */
-function renderBounty(){
+let _bountyRefreshTimer=null;
+async function renderBounty(){
+  const container=document.getElementById('bountyContent');
+  /* Show loading hint while fetching cloud data */
+  if(_fbReady&&_fbDb){
+    try{await cloudSyncBounties()}catch(e){}
+  }
+  _renderBountyUI();
+  /* Auto-refresh every 10 seconds while on bounty tab */
+  clearInterval(_bountyRefreshTimer);
+  _bountyRefreshTimer=setInterval(async()=>{
+    const sec=document.getElementById('sectionBounty');
+    if(!sec||!sec.classList.contains('active')){clearInterval(_bountyRefreshTimer);return}
+    if(_fbReady&&_fbDb){try{await cloudSyncBounties()}catch(e){}}
+    _renderBountyUI();
+  },10000);
+}
+function _renderBountyUI(){
   const u=me();
   let h=`<h2 class="sec-title">${t('bounty_title')}</h2><p class="sec-desc">${t('bounty_desc')}</p>`;
   if(u&&checkVip(u)){
@@ -872,7 +906,7 @@ function createBounty(){
   if(!db.nextBid)db.nextBid=100;
   const bounty={id:'bty'+(db.nextBid++),uid:currentUser,type:'follow',targetUrl:url,targetName:name,reward:0.1,budget,spent:0,completedBy:[],text,time:Date.now(),active:true};
   db.bounties.push(bounty);
-  cloudSaveBounty(bounty);if(_fbReady)cloudGetNextId('nextBid');
+  cloudSaveBounty(bounty);if(_fbReady){cloudGetNextId('nextBid');cloudSaveUser(currentUser)}
   saveDB();updateHeader();renderBounty();showToast(t('bounty_published'),'success');
 }
 function doBounty(bid){
@@ -886,34 +920,32 @@ function doBounty(bid){
   window.open(b.targetUrl,'_blank');
   setTimeout(()=>{
     if(confirm(t('bounty_confirm'))){
-      const nowPeople=b.completedBy?b.completedBy.length:0;
-      if(nowPeople>=requiredPeople){showToast(t('bounty_activity_ended'),'error');return}
       if(!b.completedBy)b.completedBy=[];
-      /* Local claim logic - works both online and offline */
+      /* Local claim + sync to cloud */
       function doLocalClaim(){
+        if(b.completedBy.includes(currentUser))return; /* prevent duplicate */
         b.completedBy.push(currentUser);
         b.spent=+(b.spent+b.reward).toFixed(1);
         me().balance=+(me().balance+b.reward).toFixed(1);
-        saveDB();updateHeader();renderBounty();
+        saveDB();updateHeader();_renderBountyUI();
         showToast(`+${b.reward}$ ${t('bounty_reward')}`,'success');
+        /* Always sync the full bounty to cloud after local claim */
+        if(_fbReady){cloudSaveBounty(b);cloudSaveUser(currentUser)}
       }
-      /* Try atomic cloud claim first, fallback to local */
       if(_fbReady){
-        cloudClaimBounty(bid,currentUser,b.reward).then(ok=>{
+        /* First ensure the bounty doc exists in cloud */
+        cloudSaveBounty(b).then(()=>{
+          return cloudClaimBounty(bid,currentUser,b.reward);
+        }).then(ok=>{
           if(ok){doLocalClaim()}
           else{
-            /* Cloud returned false - could be 'not found' (not synced yet), try local */
+            /* Transaction failed but doc exists, try direct local + save */
             doLocalClaim();
-            /* Sync bounty to cloud for future claims */
-            cloudSaveBounty(b);
           }
         }).catch(e=>{
           if(e==='already done')showToast(t('bounty_completed'),'info');
           else if(e==='exhausted')showToast(t('bounty_activity_ended'),'error');
-          else{
-            /* Cloud error - fallback to local */
-            doLocalClaim();
-          }
+          else{doLocalClaim()}
         });
       }else{
         doLocalClaim();
