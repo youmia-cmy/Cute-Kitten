@@ -332,7 +332,7 @@ function setupRealtimeListeners(){
           db.comments.push(nc);
           changed=true;
           /* Run autoEngage locally for new real-user posts from cloud (skip saving back) */
-          if(!_isBotId(nc.uid))autoEngage(nc,true);
+          if(!_isBotId(nc.uid)&&!nc._autoEngaged){nc._autoEngaged=true;autoEngage(nc,true)}
         }
       }
     });
@@ -424,13 +424,15 @@ async function cloudSaveCommentFull(comment){
   if(!_fbReady||!_fbDb||!comment)return;
   if(_isBotId(comment.uid))return;
   try{
-    /* Store engagement counts + truncated arrays to stay within Firestore limits */
+    /* Store total counts (including bots) for display, but only real-user data in arrays */
+    const realLikes=(comment.likes||[]).filter(l=>!_isBotId(l));
+    const realReplies=(comment.replies||[]).filter(r=>!_isBotId(r.uid));
     const data={
       id:comment.id,uid:comment.uid,text:comment.text,time:comment.time,
       likesCount:comment.likes?comment.likes.length:0,
       repliesCount:comment.replies?comment.replies.length:0,
-      likes:(comment.likes||[]).slice(0,500),
-      replies:(comment.replies||[]).slice(0,100).map(r=>({uid:r.uid,text:r.text,time:r.time}))
+      likes:realLikes.slice(0,500),
+      replies:realReplies.slice(0,100).map(r=>({uid:r.uid,text:r.text,time:r.time}))
     };
     await _fbDb.collection('comments').doc(comment.id).set(data);
   }catch(e){console.warn('Cloud save comment full failed:',e)}
@@ -450,7 +452,7 @@ async function cloudLoadComments(){
 async function cloudUpdateComment(cid,data){
   if(!_fbReady||!_fbDb)return;
   try{
-    await _fbDb.collection('comments').doc(cid).update(data);
+    await _fbDb.collection('comments').doc(cid).set(data,{merge:true});
   }catch(e){console.warn('Cloud update comment failed:',e)}
 }
 /* Refresh user comments from cloud and merge into local db */
@@ -482,7 +484,7 @@ async function cloudSyncComments(){
         if(!nc.replies)nc.replies=cc.replies||[];
         db.comments.push(nc);
         /* Run autoEngage locally for new real-user posts from cloud (skip saving back) */
-        if(!_isBotId(nc.uid))autoEngage(nc,true);
+        if(!_isBotId(nc.uid)&&!nc._autoEngaged){nc._autoEngaged=true;autoEngage(nc,true)}
       }
     });
     /* Load user profiles for unknown comment authors */
@@ -924,7 +926,11 @@ function _renderCommentsUI(){
   });
   h+=`</div>`;
   if(showCount<allComments.length){h+=`<div style="text-align:center;margin-top:20px"><button style="padding:10px 32px;border-radius:100px;border:1px solid rgba(0,240,255,.2);background:rgba(0,240,255,.05);color:var(--cyan);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body)" onclick="commentPage++;renderComments()">${t('load_more')} (${allComments.length-showCount})</button></div>`}
+  /* Preserve textarea content across re-renders */
+  const _prevInput=document.getElementById('commentInput');
+  const _savedText=_prevInput?_prevInput.value:'';
   document.getElementById('commentsContent').innerHTML=h;
+  if(_savedText){const _newInput=document.getElementById('commentInput');if(_newInput)_newInput.value=_savedText}
 }
 async function postComment(){if(!requireLogin())return;const tx=document.getElementById('commentInput').value.trim();if(!tx){showToast(t('enter_content'),'error');return}const cid='p_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);const comment={id:cid,uid:currentUser,text:tx,time:Date.now(),likes:[],replies:[]};db.comments.push(comment);me().activity.posts++;saveDB();commentPage=0;_renderCommentsUI();document.getElementById('sectionComments').scrollIntoView({behavior:'smooth',block:'start'});showToast(t('post_success'),'success');/* Save to cloud with retry */try{await cloudSaveComment(comment)}catch(e){console.warn('Initial cloud save failed, retrying...',e);try{await cloudSaveComment(comment)}catch(e2){console.warn('Cloud save retry also failed:',e2)}}autoEngage(comment)}
 function autoEngage(comment,skipCloudSave){
@@ -933,17 +939,19 @@ function autoEngage(comment,skipCloudSave){
   /* Non-VIP: 40-2000 likes, 30-1879 replies */
   const totalLikes=posterIsVip?~~(Math.random()*27001)+3000:~~(Math.random()*1961)+40;
   const totalReplies=posterIsVip?~~(Math.random()*9001)+1000:~~(Math.random()*1850)+30;
-  const shuffled=[];for(let i=0;i<totalLikes;i++){shuffled.push(SEED_USERS[i%SEED_USERS.length].id)}
+  const shuffled=[];const likeSet=new Set(comment.likes||[]);for(let i=0;i<totalLikes;i++){const bid=SEED_USERS[i%SEED_USERS.length].id;if(!likeSet.has(bid)){shuffled.push(bid);likeSet.add(bid)}}
   const txt=comment.text;
   const ctx=getContextReplies(txt);
   const replyBots=[];
   for(let i=0;i<totalReplies;i++){replyBots.push(SEED_USERS[~~(Math.random()*SEED_USERS.length)])}
   let likeIdx=0,replyIdx=0;
+  const totalNewLikes=shuffled.length;
   const likesPerTick=posterIsVip?~~(Math.random()*501)+500:~~(Math.random()*51)+30;
   const repliesPerTick=posterIsVip?~~(Math.random()*101)+50:~~(Math.random()*11)+5;
+  let timer=null;
   function tick(){
     let changed=false;
-    const le=Math.min(likeIdx+likesPerTick,totalLikes);
+    const le=Math.min(likeIdx+likesPerTick,totalNewLikes);
     for(;likeIdx<le;likeIdx++){comment.likes.push(shuffled[likeIdx]);changed=true}
     const re=Math.min(replyIdx+repliesPerTick,totalReplies);
     for(;replyIdx<re;replyIdx++){
@@ -952,15 +960,15 @@ function autoEngage(comment,skipCloudSave){
       changed=true;
     }
     if(changed){saveDB();_renderCommentsUI()}
-    const likeDone=likeIdx>=totalLikes,replyDone=replyIdx>=totalReplies;
+    const likeDone=likeIdx>=totalNewLikes,replyDone=replyIdx>=totalReplies;
     if(likeDone&&replyDone){
-      clearInterval(timer);
+      if(timer)clearInterval(timer);
       /* Save full engagement to cloud after autoEngage completes (only for original poster device) */
       if(!skipCloudSave)cloudSaveCommentFull(comment);
     }
   }
   tick();
-  const timer=setInterval(tick,800);
+  if(likeIdx<totalNewLikes||replyIdx<totalReplies){timer=setInterval(tick,800)}
 }
 function getContextReplies(txt){
   const p=['说得好！','赞同！','顶一下','哈哈不错','学到了','感谢分享','收藏了','有道理','确实如此','支持！'];
@@ -977,9 +985,9 @@ function getContextReplies(txt){
   if(/VIP|vip|悬赏|关注|奖励/.test(txt))p.push('VIP值得开','悬赏任务挺好玩的','关注了关注了','奖励真不错','VIP特效很酷','悬赏板块有意思','支持一下','这个功能好赞','活动给力','福利不错');
   return p;
 }
-function likeComment(cid){if(!requireLogin())return;const c=db.comments.find(x=>x.id===cid);if(!c)return;if(!c.likes)c.likes=[];const i=c.likes.indexOf(currentUser);if(i>=0)c.likes.splice(i,1);else{c.likes.push(currentUser);me().activity.likes++}saveDB();if(_fbReady&&!_isBotId(c.uid)){const realLikes=(c.likes||[]).filter(l=>!_isBotId(l));cloudUpdateComment(cid,{likes:realLikes}).catch(()=>{})}_renderCommentsUI()}
+function likeComment(cid){if(!requireLogin())return;const c=db.comments.find(x=>x.id===cid);if(!c)return;if(!c.likes)c.likes=[];const i=c.likes.indexOf(currentUser);if(i>=0){c.likes.splice(i,1);if(_fbReady){cloudUpdateComment(cid,{likes:firebase.firestore.FieldValue.arrayRemove(currentUser)}).catch(()=>{})}}else{c.likes.push(currentUser);me().activity.likes++;if(_fbReady){cloudUpdateComment(cid,{id:cid,likes:firebase.firestore.FieldValue.arrayUnion(currentUser)}).catch(()=>{})}}saveDB();_renderCommentsUI()}
 function toggleReply(cid){if(!requireLogin())return;showReplyFor=showReplyFor===cid?null:cid;if(showReplyFor===cid)_expandedComments.add(cid);_renderCommentsUI()}
-function postReply(cid){if(!requireLogin())return;const el=document.getElementById('ri_'+cid);if(!el)return;const t=el.value.trim();if(!t)return;const c=db.comments.find(x=>x.id===cid);if(!c)return;if(!c.replies)c.replies=[];c.replies.push({uid:currentUser,text:t,time:Date.now()});me().activity.replies++;showReplyFor=null;saveDB();if(_fbReady&&!_isBotId(c.uid)){const realReplies=(c.replies||[]).filter(r=>!_isBotId(r.uid));cloudUpdateComment(cid,{replies:realReplies}).catch(()=>{})}_renderCommentsUI()}
+function postReply(cid){if(!requireLogin())return;const el=document.getElementById('ri_'+cid);if(!el)return;const t=el.value.trim();if(!t)return;const c=db.comments.find(x=>x.id===cid);if(!c)return;if(!c.replies)c.replies=[];const newReply={uid:currentUser,text:t,time:Date.now()};c.replies.push(newReply);me().activity.replies++;showReplyFor=null;saveDB();if(_fbReady){cloudUpdateComment(cid,{id:cid,replies:firebase.firestore.FieldValue.arrayUnion({uid:newReply.uid,text:newReply.text,time:newReply.time})}).catch(()=>{})}_renderCommentsUI()}
 function timeAgo(ts){
   const now=Date.now(),d=now-ts,m=~~(d/60000),h=~~(d/3600000),dy=~~(d/86400000);
   const dt=new Date(ts),pad=n=>(n<10?'0':'')+n;
