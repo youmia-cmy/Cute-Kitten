@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Cute Kitten</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -240,7 +242,61 @@ function defaultDB(){
 }
 function loadDB(){try{const d=JSON.parse(localStorage.getItem('ck_db'));if(d&&d.users){ensureStarry(d);localStorage.setItem('ck_db',JSON.stringify(d));return d}return defaultDB();}catch{return defaultDB();}}
 function ensureStarry(d){if(!d.users['starry']){d.users['starry']={id:'starry',nick:'Cute Kitten',email:_ce(),pwd:_cp(),bio:'✨ Creator',gender:'female',vip:true,vipExpiry:'permanent',balance:10000000,avatar:CK_AVATAR,titles:[{name:'大帝',flavor:'万古唯一，至高无上',rank:6}],equippedTitle:'大帝',equippedRank:6,forgeCount:0,activity:{posts:500,replies:1200,likes:8000},customTitles:[],gameSave:{clearedLevels:[],bestScores:{}}}}else{d.users['starry'].email=_ce();d.users['starry'].pwd=_cp();d.users['starry'].vip=true;d.users['starry'].vipExpiry='permanent'}if(!d.bounties)d.bounties=[{id:'bty1',uid:'starry',type:'follow',targetUrl:'https://x.com/_StarryMiu',targetName:'CuteKitten',reward:0.1,budget:2000,spent:0,completedBy:[],text:'关注CuteKitten，可获得$喔。限量2000$。',time:Date.now()-86400000,active:true}];if(!d.nextBid)d.nextBid=100;if(!d.comments||d.comments.length<100){const userComments=(d.comments||[]).filter(c=>!c.id.startsWith('c')&&!c.id.startsWith('gc')||c.uid&&c.uid.startsWith('u_'));const seed=generateSeedComments();d.comments=[...userComments,...seed];if(!d.nextCid||d.nextCid<2000)d.nextCid=2000}}
-function saveDB(){localStorage.setItem('ck_db',JSON.stringify(db))}
+function saveDB(){localStorage.setItem('ck_db',JSON.stringify(db));if(currentUser&&currentUser!=='starry')cloudSaveUser(currentUser)}
+
+/* ===== FIREBASE CLOUD SYNC ===== */
+const FIREBASE_CONFIG={
+  apiKey:"YOUR_API_KEY",
+  authDomain:"YOUR_PROJECT.firebaseapp.com",
+  projectId:"YOUR_PROJECT_ID",
+  storageBucket:"YOUR_PROJECT.appspot.com",
+  messagingSenderId:"YOUR_SENDER_ID",
+  appId:"YOUR_APP_ID"
+};
+let _fbReady=false,_fbDb=null;
+function initFirebase(){
+  try{
+    if(FIREBASE_CONFIG.apiKey==='YOUR_API_KEY')return;
+    const app=firebase.initializeApp(FIREBASE_CONFIG);
+    _fbDb=firebase.firestore();
+    _fbReady=true;
+  }catch(e){console.warn('Firebase init failed:',e)}
+}
+initFirebase();
+function _emailKey(email){return email.replace(/[.#$\/\[\]@]/g,'_').toLowerCase()}
+async function cloudSaveUser(uid){
+  if(!_fbReady||!_fbDb)return;
+  const u=db.users[uid];if(!u||!u.email)return;
+  try{
+    const data={...u};delete data.pwd;
+    if(data.avatar&&data.avatar.length>500000)data.avatar='';
+    data._uid=uid;data._updated=Date.now();
+    await _fbDb.collection('users').doc(_emailKey(u.email)).set(data,{merge:true});
+  }catch(e){console.warn('Cloud save failed:',e)}
+}
+async function cloudSavePwd(uid){
+  if(!_fbReady||!_fbDb)return;
+  const u=db.users[uid];if(!u||!u.email)return;
+  try{
+    await _fbDb.collection('auth').doc(_emailKey(u.email)).set({pwd:u.pwd,email:u.email},{merge:true});
+  }catch(e){console.warn('Cloud auth save failed:',e)}
+}
+async function cloudLoadUser(email){
+  if(!_fbReady||!_fbDb)return null;
+  try{
+    const doc=await _fbDb.collection('users').doc(_emailKey(email)).get();
+    if(!doc.exists)return null;
+    return doc.data();
+  }catch(e){console.warn('Cloud load failed:',e);return null}
+}
+async function cloudLoadAuth(email){
+  if(!_fbReady||!_fbDb)return null;
+  try{
+    const doc=await _fbDb.collection('auth').doc(_emailKey(email)).get();
+    if(!doc.exists)return null;
+    return doc.data();
+  }catch(e){return null}
+}
 function getUser(uid){return db.users[uid]||SEED_USERS.find(u=>u.id===uid)||null}
 function me(){return currentUser?db.users[currentUser]:null}
 function resetAll(){if(!confirm(t('confirm_reset')))return;localStorage.removeItem('ck_db');localStorage.removeItem('ck_session');location.reload()}
@@ -249,13 +305,14 @@ function resetAll(){if(!confirm(t('confirm_reset')))return;localStorage.removeIt
 function switchAuthTab(t){document.querySelectorAll('.modal-tab').forEach((e,i)=>e.classList.toggle('active',t==='login'?i===0:i===1));document.getElementById('authLogin').style.display=t==='login'?'block':'none';document.getElementById('authRegister').style.display=t==='register'?'block':'none'}
 function showAuth(){document.getElementById('authModal').style.display='grid'}
 function hideAuth(){document.getElementById('authModal').style.display='none'}
-function doRegister(){
+async function doRegister(){
   const n=document.getElementById('regNick').value.trim(),e=document.getElementById('regEmail').value.trim().toLowerCase(),p=document.getElementById('regPwd').value,p2=document.getElementById('regPwd2').value,err=document.getElementById('regErr');
   if(!n||!e||!p){err.textContent=t('fill_all');return}if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){err.textContent=t('email_invalid');return}if(p.length<6){err.textContent=t('pwd_min');return}if(p!==p2){err.textContent=t('pwd_mismatch');return}if(Object.values(db.users).some(u=>u.email===e)){err.textContent=t('email_taken');return}
+  if(_fbReady){const existing=await cloudLoadAuth(e);if(existing){err.textContent=t('email_taken');return}}
   const uid='u_'+Date.now();const g=document.getElementById('regGender').value;db.users[uid]={id:uid,nick:n,email:e,pwd:p,bio:'',gender:g,avatar:'',vip:false,vipExpiry:null,balance:10,titles:[],equippedTitle:'',equippedRank:-1,forgeCount:0,activity:{posts:0,replies:0,likes:0},customTitles:[],gameSave:{clearedLevels:[],bestScores:{}}};
-  saveDB();loginAs(uid);hideAuth();showToast(t('register_success')+' '+n,'success');
+  saveDB();cloudSavePwd(uid);loginAs(uid);hideAuth();showToast(t('register_success')+' '+n,'success');
 }
-function doLogin(){
+async function doLogin(){
   const e=document.getElementById('loginEmail').value.trim(),p=document.getElementById('loginPwd').value,err=document.getElementById('loginErr');
   if(!e||!p){err.textContent=t('fill_account');return}
   const el=e.toLowerCase();
@@ -265,10 +322,23 @@ function doLogin(){
     if(!db.users['starry'])ensureStarry(db);
     loginAs('starry');hideAuth();showToast(t('welcome_back')+'，Cute Kitten','success');return;
   }
-  // Block login attempts to starry account via other means
+  // Try local first
   const u=Object.values(db.users).find(u=>u.id!=='starry'&&(u.email===el||u.email===e)&&u.pwd===p);
-  if(!u){err.textContent=t('login_fail');return}
-  loginAs(u.id);hideAuth();showToast(t('welcome_back')+'，'+u.nick,'success');
+  if(u){loginAs(u.id);hideAuth();showToast(t('welcome_back')+'，'+u.nick,'success');return}
+  // Try cloud if Firebase is ready
+  if(_fbReady){
+    err.textContent='';
+    const authData=await cloudLoadAuth(el);
+    if(!authData||authData.pwd!==p){err.textContent=t('login_fail');return}
+    const cloudUser=await cloudLoadUser(el);
+    if(!cloudUser){err.textContent=t('login_fail');return}
+    const uid=cloudUser._uid||'u_'+Date.now();
+    cloudUser.pwd=p;cloudUser.id=uid;
+    delete cloudUser._uid;delete cloudUser._updated;
+    db.users[uid]=cloudUser;
+    saveDB();loginAs(uid);hideAuth();showToast(t('welcome_back')+'，'+cloudUser.nick,'success');return;
+  }
+  err.textContent=t('login_fail');
 }
 function loginAs(uid){currentUser=uid;localStorage.setItem('ck_session',uid);updateHeader();renderAll()}
 function logout(){currentUser=null;localStorage.removeItem('ck_session');updateHeader();renderAll();showToast(t('logged_out'),'info')}
