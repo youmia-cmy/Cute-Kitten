@@ -203,46 +203,50 @@ function updateLangBtn(){const b=document.getElementById('langToggle');if(b)b.te
 function updateNavTabs(){const tabs=document.querySelectorAll('.nav-tab');const keys=['nav_forge','nav_game','nav_comments','nav_bounty','nav_rank','nav_pay','nav_follow','nav_profile'];tabs.forEach((tab,i)=>{if(keys[i])tab.querySelector('span').textContent=t(keys[i])})}
 function updateAuthModal(){const m=document.getElementById('authModal');if(!m)return;const tabs=m.querySelectorAll('.modal-tab');if(tabs[0])tabs[0].textContent=t('login');if(tabs[1])tabs[1].textContent=t('register');const le=document.getElementById('loginEmail');if(le)le.placeholder=t('email_ph');const lp=document.getElementById('loginPwd');if(lp)lp.placeholder=t('pwd_ph');const lb=m.querySelector('#authLogin .auth-btn');if(lb)lb.textContent=t('login_btn');const rn=document.getElementById('regNick');if(rn)rn.placeholder=t('nick_ph');const rg=document.getElementById('regGender');if(rg){rg.options[0].text=t('male');rg.options[1].text=t('female')}const re=document.getElementById('regEmail');if(re)re.placeholder=t('email_addr_ph');const rp=document.getElementById('regPwd');if(rp)rp.placeholder=t('pwd_min_ph');const rp2=document.getElementById('regPwd2');if(rp2)rp2.placeholder=t('pwd_confirm_ph');const rb=m.querySelector('#authRegister .auth-btn');if(rb)rb.textContent=t('register_btn')}
 function updateResetBtn(){}
+/* ===== SEEDED PRNG (deterministic across all devices) ===== */
+function _mulberry32(seed){let s=seed|0;return function(){s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 /* ===== SEED DATA GENERATION ===== */
 const _NA=['星辰','暗夜','流光','幻影','疾风','烈焰','寒冰','雷霆','破晓','苍穹','深渊','极光','天际','银河','碧落','紫霄','玄冥','太虚','无极','九天'];
 const _NB=['猎手','骑士','行者','守卫','使者','先锋','领主','剑客','法师','术士','战神','勇者','隐士','游侠','斗士','王者','霸主','狂人','大师','智者'];
 const _TITLES_POOL=TITLES.filter(t=>t.name!=='大帝');
 const SEED_USERS=[];
 (function(){
+  const rng=_mulberry32(20240317);
   for(let i=0;i<100;i++){
     const nick=_NA[i%20]+_NB[~~(i/5)%20];
     const ti=_TITLES_POOL[i%_TITLES_POOL.length];
-    const posts=~~(Math.random()*50)+5+~~((100-i)/5);
-    const replies=~~(Math.random()*120)+10+~~((100-i)/3);
-    const likes=~~(Math.random()*300)+20+~~((100-i)*2);
-    const ri=i<5?~~(Math.random()*2)+4:i<15?~~(Math.random()*2)+2:i<40?~~(Math.random()*2)+1:~~(Math.random()*2);
-    SEED_USERS.push({id:'bot'+(i+1),nick:nick,email:'bot'+(i+1)+'@x.com',bio:'',avatar:'',gender:Math.random()>.5?'male':'female',vip:false,equippedTitle:ti.name,equippedRank:ti.rank,activity:{posts,replies,likes}});
+    const posts=~~(rng()*50)+5+~~((100-i)/5);
+    const replies=~~(rng()*120)+10+~~((100-i)/3);
+    const likes=~~(rng()*300)+20+~~((100-i)*2);
+    const ri=i<5?~~(rng()*2)+4:i<15?~~(rng()*2)+2:i<40?~~(rng()*2)+1:~~(rng()*2);
+    SEED_USERS.push({id:'bot'+(i+1),nick:nick,email:'bot'+(i+1)+'@x.com',bio:'',avatar:'',gender:rng()>.5?'male':'female',vip:false,equippedTitle:ti.name,equippedRank:ti.rank,activity:{posts,replies,likes}});
   }
 })();
 const _CT=['这关好难，有人通关了吗？','终于通关了！太开心了！','这个BOSS怎么打？血太厚了','刚锻造了一个称号，运气不错','新人报到，大家好！','这游戏太好玩了吧','有没有大佬带带萌新','称号系统太酷了','修仙修仙，先从练气开始','有没有大佬分享通关技巧','BOSS战技巧：跳起来打比较容易','签到打卡~','排行榜冲冲冲！','这个称号的颜色好好看','装备了新称号，感觉自己变强了','大乘期的称号太帅了吧','刚通关训练场，操作还需要练习','沙漠前哨的敌人好多','城市巷战是最难的一关','雪山基地的风景不错','今天运气好，一次过了两关','余额不够锻造称号了，sad','这个社区氛围真好','练气期的菜鸟瑟瑟发抖','金丹期了！向元婴进发！','每天打卡一下~加油','终于进入前十了，开心','第五关丛林的BOSS太猛了','火山关的子弹密度太高','太空站那关操作要求真高','最终堡垒的BOSS打了五次才过','谁来说说怎么快速升称号','自定义称号真的太酷了','修仙世界的天花板在哪里','活跃度排行我要冲第一','佩戴大乘期称号的大佬好厉害','这波操作我给满分','第三关卡了好久终于过了','地下工厂的敌人速度好快','深海要塞的地形好复杂'];
 const _GT=['训练场第一关无伤通关，分享一下走位技巧','沙漠前哨的敌人出现规律是什么？感觉每次都不一样','城市巷战攻略：靠左侧走可以减少被夹击的概率','雪山基地的地面太滑了吧，跳跃手感完全不同','丛林深处BOSS的弱点在哪？打了好多次了','地下工厂的敌人射速太快，根本来不及躲','火山熔岩关卡BOSS会二阶段变身吗？血量突然回了','深海要塞24个敌人真的太多了，弹药都不够用','太空站最难的不是BOSS，是那些高速移动的杂兵','最终堡垒通关！全10关完成，撒花！','第一关训练场3分钟速通，有没有更快的','沙漠关最烦的是两边同时出兵的时候','城市巷战建议全程蹲着打，减少被击中概率','雪山基地的敌人AI比前几关聪明太多了','丛林BOSS第一次见面就把我秒了，30血太猛','地下工厂背景太暗看不清子弹轨迹','火山关的地面是不是有持续伤害？感觉血一直在掉','深海要塞推荐打法：先清右边再清左边','太空站BOSS的两发子弹要同时躲，不能只看一发','最终BOSS血量80也太厚了，子弹打上去跟挠痒似的','有没有人全关S评价通关的？','第二关沙漠12个兵分三波出，第二波最难','城市巷战16个敌人应该是游戏里最考验操作的','雪山基地通关后奖励的1$好香','丛林关BOSS战建议留满血再打','地下工厂22个敌人但是没BOSS，纯清兵也挺爽的','火山BOSS推荐贴墙打，可以躲掉斜向子弹','深海关通关秘诀：不要贪刀，稳着来','太空站敌人速度2.0是什么鬼，根本打不中','最终堡垒攻略：BOSS出来前先把15个杂兵清完','训练场是新手最好的练习关，建议反复打','沙漠前哨的沙地颜色好评，氛围感很强','城市巷战的灰蓝色背景好酷','刚发现跳起来射击判定范围更大','BOSS战核心：贴地跑+跳射','连续通关5关不死，成就感爆表','地下工厂的工业风地图很有感觉','火山关红色背景看久了眼睛有点累','深海蓝色调特别好看，最喜欢这个关卡美术','太空站的紫色背景很适合这种科幻风','最终堡垒暗红色调紧张感拉满','请问武器可以升级吗？感觉后面关卡输出不够','跳跃高度刚刚好，操作手感很舒服','移动速度会随关卡变化吗？感觉后面敌人快了','BOSS的血条设计很清楚，好评','每关通关1$奖励很合理，不会觉得太少','连续被BOSS击杀3次了，不甘心','刚从第8关深海要塞出来，汗都出来了','太空站那关真的是手速游戏','全通关了！10关一共花了两天时间','训练场8个敌人就是热热身','沙漠关建议新手多打几遍熟悉节奏','城市巷战可以说是前4关的毕业考试','雪山关过了就算中期玩家了','丛林BOSS是第一个门槛，很多人卡这里','地下工厂22个敌人体力消耗太大了','火山关BOSS有40血，比丛林BOSS难打','深海关虽然没BOSS但敌人数量最多','太空站是后期最难的关卡之一','最终堡垒BOSS 80血建议预留满血挑战','为什么我打第三关总是在最后几个兵翻车','丛林关的绿色地面跟背景融合得很好','城市关的敌人经常从两侧夹击，要注意','训练场已经打了20遍了，练无伤通关','沙漠前哨速度1.2其实还好，第七关才恐怖','雪山基地通关后信心大增，一口气连过两关','有没有第五关BOSS详细攻略','地下工厂纯清兵关最适合刷分','火山关跟太空站哪个更难？个人觉得太空站','深海关的蓝色子弹有时候看不太清','每次通关都有奖励真的很有动力','最终BOSS第二形态子弹是不是变快了','今天目标：通关到第七关','操作建议：左手控制移动，右手控制跳射','手机端操作比PC难好多','PC端Z键射击太顺手了','手机虚拟按键有点小，希望能调大','跳射是最重要的技巧，一定要学会','敌人的子弹追踪有点强，多跳可以躲','站在角落可以减少一个方向的威胁','BOSS战的时候可以利用跳跃无敌帧吗','全屏子弹雨的时候真的只能靠走位','打BOSS建议节奏：射3下跳1次','第四关后难度明显提升','训练场速通记录有人破1分钟吗','敌人被击杀的粒子特效好看','BOSS爆炸的20个粒子太爽了','这游戏虽然是像素风但很耐玩','连打3小时根本停不下来','每关的配色都不一样，美术真用心','GG全10关通关，我是传说佣兵王了','第九关太空站BOSS 50血打了我8次','最终堡垒15个杂兵出现频率好高','火山BOSS推荐距离：中远距离最安全','丛林BOSS近战打法：贴着打然后跳躲','城市巷战最后一波4个兵同时出太刺激了','训练场无伤满分有额外奖励吗','深海关24个兵分几波？感觉出兵不停','太空站那个速度2.0真的是极限了','装备了称号再打BOSS感觉运气好了','打游戏攒的$够锻造一个称号了','10关全通拿到10$，马上去锻造','游戏手感真的不错，回馈感很强','敌人子弹是追踪的吗还是固定方向','BOSS子弹有两种，直线和斜向的','建议先熟悉每关出兵节奏再打','这个游戏有没有隐藏关卡','每关敌人数量我都记下来了：8 12 16 18 20 22 20 24 22 15','BOSS关分别在第5 7 9 10关','无BOSS关卡适合休闲打，BOSS关要认真','全通关后重玩可以选关，太贴心了','第一次打第十关时紧张得手抖','最终BOSS的子弹密度是所有BOSS里最大的','新手建议路线：先反复打前3关练手','中级玩家卡丛林BOSS很正常，多打就好','高手挑战：全关无伤通关','谁的通关速度最快？晒一下','游戏+称号锻造的组合太上头了','玩了一下午，余额从10$涨到20$了','突击行动是我最喜欢的功能','每天打两关，感觉在变强','BOSS爆了之后的得分+500很爽','杂兵一个100分，一关最高能拿多少','训练场8个兵最多800分加上通关','火山关20个兵+BOSS 40血=2500分左右','深海关24个兵=2400分，纯杂兵关分数最高','最终堡垒BOSS 80血打掉给500分，加上15个兵=2000分','分数跟通关奖励没关系对吧，都是1$','第七关火山熔岩是我噩梦','太空站的紫色调太好看了，截图做壁纸','城市巷战灰蓝色调有种末日感','沙漠的黄色配合敌人红色很搭','丛林绿色是最护眼的一关','训练场的绿色让人感觉很安全','雪山关白色调很干净','地下工厂黑灰色调最符合工业风','最终堡垒暗红色=危险信号','每个关卡配色都很用心，给美术点赞','刚打完第5关，手还在抖','城市巷战的16个敌人出兵速度太快了','请问通关后还能重复拿1$吗','通关奖励只有首次通关才有','那就是最多10$通关奖励','10$加上初始10$等于20$可以锻造不少了','打到第八关了，剩余两关明天继续','今天从第一关一口气打到第六关','连续通关的感觉太爽了','建议：打BOSS之前先把血回满……等等没有回血','确实没回血机制，所以杂兵阶段要少挨打','HP管理是这个游戏最重要的技巧','100HP要撑过整关，平均每次被打扣8点','那就是最多挨12下左右就GG了','BOSS关更要注意HP，杂兵阶段多挨几下BOSS就没血了','我一般杂兵阶段控制在扣血30以内','70血打BOSS够用吗','丛林BOSS 70血差不多够，最终BOSS可能不太够','操作好的话50血也能打BOSS','刚学会了Z字走位躲弹幕','跳射+Z字走位是通关标配','今天通关目标：第九关太空站','刚被太空站BOSS送回主菜单了','太空站BOSS 50血感觉比最终BOSS还难打','因为太空站敌人速度2.0，BOSS阶段压力太大','加上之前清22个高速杂兵消耗的HP','所以太空站才是真正的最难关卡','最终堡垒杂兵只有15个，反而轻松些','但最终BOSS 80血持久战也不简单','两个关各有难点，看个人操作风格','手残党表示第四关就够呛了','没事多练就好，我也是从手残过来的'];
 const _REPLIES=['加油！后面更刺激','确实，我也卡了好久','同感！太难了','哈哈恭喜通关！','新人欢迎~','技巧就是多跳多躲','我也是，练气期菜鸟','签到+1','一起冲！','这关我也打了好多次','试试跳起来打','BOSS有规律的，多打几次就懂了','我也是这样过的','确实好难，加油','操作熟练就好了','同意，这关最难','我的经验是贴墙走','这个技巧学到了','打了十次终于过了','分享一下你的走位'];
 function generateSeedComments(){
+  const rng=_mulberry32(88888888);
   const comments=[];const now=Date.now();
   for(let i=0;i<1000;i++){
     const uid=SEED_USERS[i%100].id;
     const text=_CT[i%_CT.length];
-    const time=now-~~(Math.random()*30*86400000);
-    const likeCount=~~(Math.random()*8);
-    const likes=[];for(let j=0;j<likeCount;j++){const lu=SEED_USERS[~~(Math.random()*100)].id;if(!likes.includes(lu))likes.push(lu)}
+    const time=now-~~(rng()*30*86400000);
+    const likeCount=~~(rng()*8);
+    const likes=[];for(let j=0;j<likeCount;j++){const lu=SEED_USERS[~~(rng()*100)].id;if(!likes.includes(lu))likes.push(lu)}
     const replies=[];
-    if(Math.random()>.6){const rc=~~(Math.random()*3)+1;for(let j=0;j<rc;j++){replies.push({uid:SEED_USERS[~~(Math.random()*100)].id,text:_REPLIES[~~(Math.random()*_REPLIES.length)],time:time+~~(Math.random()*3600000)})}}
+    if(rng()>.6){const rc=~~(rng()*3)+1;for(let j=0;j<rc;j++){replies.push({uid:SEED_USERS[~~(rng()*100)].id,text:_REPLIES[~~(rng()*_REPLIES.length)],time:time+~~(rng()*3600000)})}}
     comments.push({id:'c'+i,uid,text,time,likes,replies});
   }
   // 200 game discussion posts
   for(let i=0;i<200;i++){
     const uid=SEED_USERS[i%100].id;
     const text=_GT[i%_GT.length];
-    const time=now-~~(Math.random()*14*86400000);
-    const likeCount=~~(Math.random()*12)+1;
-    const likes=[];for(let j=0;j<likeCount;j++){const lu=SEED_USERS[~~(Math.random()*100)].id;if(!likes.includes(lu))likes.push(lu)}
+    const time=now-~~(rng()*14*86400000);
+    const likeCount=~~(rng()*12)+1;
+    const likes=[];for(let j=0;j<likeCount;j++){const lu=SEED_USERS[~~(rng()*100)].id;if(!likes.includes(lu))likes.push(lu)}
     const replies=[];
-    if(Math.random()>.4){const rc=~~(Math.random()*4)+1;for(let j=0;j<rc;j++){replies.push({uid:SEED_USERS[~~(Math.random()*100)].id,text:_REPLIES[~~(Math.random()*_REPLIES.length)],time:time+~~(Math.random()*7200000)})}}
+    if(rng()>.4){const rc=~~(rng()*4)+1;for(let j=0;j<rc;j++){replies.push({uid:SEED_USERS[~~(rng()*100)].id,text:_REPLIES[~~(rng()*_REPLIES.length)],time:time+~~(rng()*7200000)})}}
     comments.push({id:'gc'+(1000+i),uid,text,time,likes,replies});
   }
   return comments;
@@ -259,7 +263,7 @@ function defaultDB(){
   return{users,comments,bounties,nextCid:2000,nextBid:100};
 }
 function loadDB(){try{const d=JSON.parse(localStorage.getItem('ck_db'));if(d&&d.users){ensureStarry(d);localStorage.setItem('ck_db',JSON.stringify(d));return d}return defaultDB();}catch{return defaultDB();}}
-function ensureStarry(d){if(!d.users['starry']){d.users['starry']={id:'starry',nick:'Cute Kitten',email:_ce(),pwdHash:_STARRY_HASH,bio:'✨ Creator',gender:'female',vip:true,vipExpiry:'permanent',balance:10000000,avatar:CK_AVATAR,titles:[{name:'大帝',flavor:'万古唯一，至高无上',rank:6}],equippedTitle:'大帝',equippedRank:6,forgeCount:0,activity:{posts:500,replies:1200,likes:8000},customTitles:[],gameSave:{clearedLevels:[],bestScores:{}}}}else{d.users['starry'].email=_ce();d.users['starry'].pwdHash=_STARRY_HASH;delete d.users['starry'].pwd;d.users['starry'].vip=true;d.users['starry'].vipExpiry='permanent'}_initTestAccounts(d.users);if(!d.bounties)d.bounties=[{id:'bty1',uid:'starry',type:'follow',targetUrl:'https://x.com/_StarryMiu',targetName:'CuteKitten',reward:0.1,budget:2000,spent:0,completedBy:[],text:'关注CuteKitten，可获得$喔。限量2000$。',time:Date.now()-86400000,active:true}];if(!d.nextBid)d.nextBid=100;if(!d.comments||d.comments.length<100){const userComments=(d.comments||[]).filter(c=>!c.id.startsWith('c')&&!c.id.startsWith('gc')||c.uid&&c.uid.startsWith('u_'));const seed=generateSeedComments();d.comments=[...userComments,...seed];if(!d.nextCid||d.nextCid<2000)d.nextCid=2000}}
+function ensureStarry(d){if(!d.users['starry']){d.users['starry']={id:'starry',nick:'Cute Kitten',email:_ce(),pwdHash:_STARRY_HASH,bio:'✨ Creator',gender:'female',vip:true,vipExpiry:'permanent',balance:10000000,avatar:CK_AVATAR,titles:[{name:'大帝',flavor:'万古唯一，至高无上',rank:6}],equippedTitle:'大帝',equippedRank:6,forgeCount:0,activity:{posts:500,replies:1200,likes:8000},customTitles:[],gameSave:{clearedLevels:[],bestScores:{}}}}else{d.users['starry'].email=_ce();d.users['starry'].pwdHash=_STARRY_HASH;delete d.users['starry'].pwd;d.users['starry'].vip=true;d.users['starry'].vipExpiry='permanent'}_initTestAccounts(d.users);if(!d.bounties)d.bounties=[{id:'bty1',uid:'starry',type:'follow',targetUrl:'https://x.com/_StarryMiu',targetName:'CuteKitten',reward:0.1,budget:2000,spent:0,completedBy:[],text:'关注CuteKitten，可获得$喔。限量2000$。',time:Date.now()-86400000,active:true}];if(!d.nextBid)d.nextBid=100;const hasSeedComments=d.comments&&d.comments.some(c=>c.id==='c0');if(!hasSeedComments){const userComments=(d.comments||[]).filter(c=>(c.uid&&!c.uid.startsWith('bot'))||c.id.startsWith('p_'));const seed=generateSeedComments();d.comments=[...userComments,...seed];if(!d.nextCid||d.nextCid<2000)d.nextCid=2000}}
 function saveDB(){localStorage.setItem('ck_db',JSON.stringify(db));if(_fbReady&&currentUser){cloudSaveUser(currentUser)}}
 
 /* ===== FIREBASE CLOUD SYNC ===== */
@@ -308,6 +312,8 @@ function setupRealtimeListeners(){
           if(!nc.replies)nc.replies=cc.replies||[];
           db.comments.push(nc);
           changed=true;
+          /* Run autoEngage locally for new real-user posts from cloud (skip saving back) */
+          if(!_isBotId(nc.uid))autoEngage(nc,true);
         }
       }
     });
@@ -452,6 +458,8 @@ async function cloudSyncComments(){
         if(!nc.likes)nc.likes=cc.likes||[];
         if(!nc.replies)nc.replies=cc.replies||[];
         db.comments.push(nc);
+        /* Run autoEngage locally for new real-user posts from cloud (skip saving back) */
+        if(!_isBotId(nc.uid))autoEngage(nc,true);
       }
     });
     /* Load user profiles for unknown comment authors */
@@ -896,7 +904,7 @@ function _renderCommentsUI(){
   document.getElementById('commentsContent').innerHTML=h;
 }
 function postComment(){if(!requireLogin())return;const tx=document.getElementById('commentInput').value.trim();if(!tx){showToast(t('enter_content'),'error');return}const cid='p_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);const comment={id:cid,uid:currentUser,text:tx,time:Date.now(),likes:[],replies:[]};db.comments.push(comment);me().activity.posts++;cloudSaveComment(comment);autoEngage(comment);saveDB();commentPage=0;_renderCommentsUI();document.getElementById('sectionComments').scrollIntoView({behavior:'smooth',block:'start'});showToast(t('post_success'),'success')}
-function autoEngage(comment){
+function autoEngage(comment,skipCloudSave){
   const posterIsVip=isVipPost(comment.uid);
   /* VIP: 3000-30000 likes, 1000-10000 replies */
   /* Non-VIP: 40-2000 likes, 30-1879 replies */
@@ -924,8 +932,8 @@ function autoEngage(comment){
     const likeDone=likeIdx>=totalLikes,replyDone=replyIdx>=totalReplies;
     if(likeDone&&replyDone){
       clearInterval(timer);
-      /* Save full engagement to cloud after autoEngage completes */
-      cloudSaveCommentFull(comment);
+      /* Save full engagement to cloud after autoEngage completes (only for original poster device) */
+      if(!skipCloudSave)cloudSaveCommentFull(comment);
     }
   }
   tick();
