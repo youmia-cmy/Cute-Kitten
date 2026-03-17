@@ -242,7 +242,7 @@ function defaultDB(){
 }
 function loadDB(){try{const d=JSON.parse(localStorage.getItem('ck_db'));if(d&&d.users){ensureStarry(d);localStorage.setItem('ck_db',JSON.stringify(d));return d}return defaultDB();}catch{return defaultDB();}}
 function ensureStarry(d){if(!d.users['starry']){d.users['starry']={id:'starry',nick:'Cute Kitten',email:_ce(),pwdHash:_STARRY_HASH,bio:'✨ Creator',gender:'female',vip:true,vipExpiry:'permanent',balance:10000000,avatar:CK_AVATAR,titles:[{name:'大帝',flavor:'万古唯一，至高无上',rank:6}],equippedTitle:'大帝',equippedRank:6,forgeCount:0,activity:{posts:500,replies:1200,likes:8000},customTitles:[],gameSave:{clearedLevels:[],bestScores:{}}}}else{d.users['starry'].email=_ce();d.users['starry'].pwdHash=_STARRY_HASH;delete d.users['starry'].pwd;d.users['starry'].vip=true;d.users['starry'].vipExpiry='permanent'}if(!d.bounties)d.bounties=[{id:'bty1',uid:'starry',type:'follow',targetUrl:'https://x.com/_StarryMiu',targetName:'CuteKitten',reward:0.1,budget:2000,spent:0,completedBy:[],text:'关注CuteKitten，可获得$喔。限量2000$。',time:Date.now()-86400000,active:true}];if(!d.nextBid)d.nextBid=100;if(!d.comments||d.comments.length<100){const userComments=(d.comments||[]).filter(c=>!c.id.startsWith('c')&&!c.id.startsWith('gc')||c.uid&&c.uid.startsWith('u_'));const seed=generateSeedComments();d.comments=[...userComments,...seed];if(!d.nextCid||d.nextCid<2000)d.nextCid=2000}}
-function saveDB(){localStorage.setItem('ck_db',JSON.stringify(db));if(_fbReady&&currentUser&&currentUser!=='starry'){cloudSaveUser(currentUser)}}
+function saveDB(){localStorage.setItem('ck_db',JSON.stringify(db));if(_fbReady&&currentUser){cloudSaveUser(currentUser)}}
 
 /* ===== FIREBASE CLOUD SYNC ===== */
 const FIREBASE_CONFIG={
@@ -264,7 +264,8 @@ function initFirebase(){
 }
 initFirebase();
 function _emailKey(email){return email.replace(/[.#$\/\[\]@]/g,'_').toLowerCase()}
-function _isBotId(uid){return uid&&(uid.startsWith('bot')||uid==='starry')}
+function _isBotId(uid){return uid&&uid.startsWith('bot')}
+function _isSeedBot(uid){return uid&&uid.startsWith('bot')}
 /* --- User operations --- */
 async function cloudSaveUser(uid){
   if(!_fbReady||!_fbDb)return;
@@ -369,6 +370,9 @@ async function cloudSyncComments(){
         db.comments.push(nc);
       }
     });
+    /* Load user profiles for unknown comment authors */
+    const allUids=[...new Set(db.comments.filter(c=>!_isBotId(c.uid)).map(c=>c.uid))];
+    await ensureCloudUsers(allUids);
     localStorage.setItem('ck_db',JSON.stringify(db));
   }catch(e){console.warn('Cloud sync comments failed:',e)}
 }
@@ -471,7 +475,18 @@ async function cloudSyncAll(){
     updateHeader();renderAll();
   }catch(e){console.warn('Cloud sync failed:',e)}
 }
-function getUser(uid){return db.users[uid]||SEED_USERS.find(u=>u.id===uid)||null}
+function getUser(uid){return db.users[uid]||SEED_USERS.find(u=>u.id===uid)||_cloudUserCache[uid]||null}
+const _cloudUserCache={};
+async function ensureCloudUsers(uids){
+  if(!_fbReady||!_fbDb)return;
+  const unknown=uids.filter(uid=>!db.users[uid]&&!SEED_USERS.find(u=>u.id===uid)&&!_cloudUserCache[uid]);
+  if(unknown.length===0)return;
+  try{
+    const snap=await _fbDb.collection('users').get();
+    const byUid={};snap.forEach(doc=>{const d=doc.data();if(d._uid)byUid[d._uid]=d;});
+    unknown.forEach(uid=>{if(byUid[uid]){_cloudUserCache[uid]=byUid[uid]}});
+  }catch(e){console.warn('ensureCloudUsers failed:',e)}
+}
 function me(){return currentUser?db.users[currentUser]:null}
 function resetAll(){}
 
