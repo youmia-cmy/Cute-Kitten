@@ -122,7 +122,6 @@ select.auth-input,select.profile-input{appearance:auto;background:rgba(255,255,2
 @keyframes vipRingSpin{to{transform:rotate(360deg)}}
 @keyframes mirrorShine{0%,100%{left:-60%;opacity:0}50%{left:110%;opacity:1}}
 .toast-container{position:fixed;top:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:6px}.toast{padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;background:var(--bg-card);border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 30px rgba(0,0,0,.4);animation:toastIn .4s;display:flex;align-items:center;gap:8px}.toast.success{border-color:rgba(0,255,136,.3)}.toast.error{border-color:rgba(255,68,68,.3)}.toast.info{border-color:rgba(0,240,255,.3)}@keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
-.reset-btn{position:fixed;bottom:12px;right:12px;z-index:10;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.6);color:var(--text-dim);font-size:10px;cursor:pointer;font-family:var(--font-mono)}.reset-btn:hover{border-color:rgba(255,68,68,.3);color:#ff6b6b}
 @media(max-width:640px){header{padding:12px}nav{padding:10px 8px 0}.nav-tab{padding:8px 12px;font-size:11px}main{padding:16px 12px 40px}.forge-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}}
 </style>
 </head>
@@ -143,7 +142,6 @@ select.auth-input,select.profile-input{appearance:auto;background:rgba(255,255,2
 <div class="section" id="sectionProfile"><div id="profileContent"></div></div>
 </main></div>
 <div class="toast-container" id="toastContainer"></div>
-<button class="reset-btn" onclick="resetAll()" id="resetBtn">重置数据</button>
 <script>
 /* ===== CONFIG ===== */
 const RECEIVER='0x754104292463f0a14ae23c79b2d3395d3398cccc';
@@ -187,7 +185,7 @@ function toggleLang(){currentLang=currentLang==='zh'?'en':'zh';localStorage.setI
 function updateLangBtn(){const b=document.getElementById('langToggle');if(b)b.textContent=currentLang==='zh'?'EN':'中'}
 function updateNavTabs(){const tabs=document.querySelectorAll('.nav-tab');const keys=['nav_forge','nav_game','nav_comments','nav_bounty','nav_rank','nav_pay','nav_follow','nav_profile'];tabs.forEach((tab,i)=>{if(keys[i])tab.querySelector('span').textContent=t(keys[i])})}
 function updateAuthModal(){const m=document.getElementById('authModal');if(!m)return;const tabs=m.querySelectorAll('.modal-tab');if(tabs[0])tabs[0].textContent=t('login');if(tabs[1])tabs[1].textContent=t('register');const le=document.getElementById('loginEmail');if(le)le.placeholder=t('email_ph');const lp=document.getElementById('loginPwd');if(lp)lp.placeholder=t('pwd_ph');const lb=m.querySelector('#authLogin .auth-btn');if(lb)lb.textContent=t('login_btn');const rn=document.getElementById('regNick');if(rn)rn.placeholder=t('nick_ph');const rg=document.getElementById('regGender');if(rg){rg.options[0].text=t('male');rg.options[1].text=t('female')}const re=document.getElementById('regEmail');if(re)re.placeholder=t('email_addr_ph');const rp=document.getElementById('regPwd');if(rp)rp.placeholder=t('pwd_min_ph');const rp2=document.getElementById('regPwd2');if(rp2)rp2.placeholder=t('pwd_confirm_ph');const rb=m.querySelector('#authRegister .auth-btn');if(rb)rb.textContent=t('register_btn')}
-function updateResetBtn(){const b=document.querySelector('.reset-btn');if(b)b.textContent=t('reset_data')}
+function updateResetBtn(){}
 /* ===== SEED DATA GENERATION ===== */
 const _NA=['星辰','暗夜','流光','幻影','疾风','烈焰','寒冰','雷霆','破晓','苍穹','深渊','极光','天际','银河','碧落','紫霄','玄冥','太虚','无极','九天'];
 const _NB=['猎手','骑士','行者','守卫','使者','先锋','领主','剑客','法师','术士','战神','勇者','隐士','游侠','斗士','王者','霸主','狂人','大师','智者'];
@@ -445,7 +443,7 @@ async function cloudSyncAll(){
 }
 function getUser(uid){return db.users[uid]||SEED_USERS.find(u=>u.id===uid)||null}
 function me(){return currentUser?db.users[currentUser]:null}
-function resetAll(){if(!confirm(t('confirm_reset')))return;localStorage.removeItem('ck_db');localStorage.removeItem('ck_session');location.reload()}
+function resetAll(){}
 
 /* ===== AUTH ===== */
 function switchAuthTab(t){document.querySelectorAll('.modal-tab').forEach((e,i)=>e.classList.toggle('active',t==='login'?i===0:i===1));document.getElementById('authLogin').style.display=t==='login'?'block':'none';document.getElementById('authRegister').style.display=t==='register'?'block':'none'}
@@ -750,7 +748,7 @@ function renderComments(){
   if(showCount<allComments.length){h+=`<div style="text-align:center;margin-top:20px"><button style="padding:10px 32px;border-radius:100px;border:1px solid rgba(0,240,255,.2);background:rgba(0,240,255,.05);color:var(--cyan);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body)" onclick="commentPage++;renderComments()">${t('load_more')} (${allComments.length-showCount})</button></div>`}
   document.getElementById('commentsContent').innerHTML=h;
 }
-function postComment(){if(!requireLogin())return;const tx=document.getElementById('commentInput').value.trim();if(!tx){showToast(t('enter_content'),'error');return}const cid='c'+(db.nextCid++);const comment={id:cid,uid:currentUser,text:tx,time:Date.now(),likes:[],replies:[]};db.comments.push(comment);me().activity.posts++;cloudSaveComment(comment);if(_fbReady)cloudGetNextId('nextCid');autoEngage(comment);saveDB();renderComments();showToast(t('post_success'),'success')}
+function postComment(){if(!requireLogin())return;const tx=document.getElementById('commentInput').value.trim();if(!tx){showToast(t('enter_content'),'error');return}const cid='c'+(db.nextCid++);const comment={id:cid,uid:currentUser,text:tx,time:Date.now(),likes:[],replies:[]};db.comments.push(comment);me().activity.posts++;cloudSaveComment(comment);if(_fbReady)cloudGetNextId('nextCid');autoEngage(comment);saveDB();commentPage=0;renderComments();document.getElementById('sectionComments').scrollIntoView({behavior:'smooth',block:'start'});showToast(t('post_success'),'success')}
 function autoEngage(comment){
   const totalLikes=~~(Math.random()*701)+100;
   const totalReplies=~~(Math.random()*191)+10;
