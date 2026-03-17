@@ -438,13 +438,14 @@ async function doRegister(){
   if(_fbReady){try{const doc=await _fbDb.collection('auth').doc(_emailKey(e)).get();if(doc.exists){err.textContent=t('email_taken');return}}catch(ex){}}
   const hash=await sha256(p);
   const uid='u_'+Date.now();const g=document.getElementById('regGender').value;db.users[uid]={id:uid,nick:n,email:e,pwdHash:hash,bio:'',gender:g,avatar:'',vip:false,vipExpiry:null,balance:10,titles:[],equippedTitle:'',equippedRank:-1,forgeCount:0,activity:{posts:0,replies:0,likes:0},customTitles:[],gameSave:{clearedLevels:[],bestScores:{}}};
-  saveDB();cloudSaveAuth(e,hash);loginAs(uid);hideAuth();showToast(t('register_success')+' '+n,'success');
+  saveDB();await cloudSaveAuth(e,hash);await cloudSaveUser(uid);loginAs(uid);hideAuth();showToast(t('register_success')+' '+n,'success');
 }
 async function doLogin(){
   const e=document.getElementById('loginEmail').value.trim(),p=document.getElementById('loginPwd').value,err=document.getElementById('loginErr');
   if(!e||!p){err.textContent=t('fill_account');return}
   const el=e.toLowerCase();
-  const hash=await sha256(p);
+  let hash;
+  try{hash=await sha256(p)}catch(ex){err.textContent=t('login_fail');return}
   // StarryMiu account: strictly verify credentials via hash
   if(el===_ce()){
     if(hash!==_STARRY_HASH){err.textContent=t('login_fail');return}
@@ -459,16 +460,18 @@ async function doLogin(){
   if(legacy){legacy.pwdHash=hash;delete legacy.pwd;saveDB();cloudSaveAuth(legacy.email,hash);loginAs(legacy.id);hideAuth();showToast(t('welcome_back')+'，'+legacy.nick,'success');return}
   // Try cloud if Firebase is ready
   if(_fbReady){
-    err.textContent='';
-    const verified=await cloudVerifyAuth(el,p);
-    if(!verified){err.textContent=t('login_fail');return}
-    const cloudUser=await cloudLoadUser(el);
-    if(!cloudUser){err.textContent=t('login_fail');return}
-    const uid=cloudUser._uid||'u_'+Date.now();
-    cloudUser.pwdHash=hash;cloudUser.id=uid;
-    delete cloudUser._uid;delete cloudUser._updated;delete cloudUser.pwd;
-    db.users[uid]=cloudUser;
-    saveDB();loginAs(uid);hideAuth();showToast(t('welcome_back')+'，'+cloudUser.nick,'success');return;
+    try{
+      err.textContent='';
+      const verified=await cloudVerifyAuth(el,p);
+      if(!verified){err.textContent=t('login_fail');return}
+      const cloudUser=await cloudLoadUser(el);
+      if(!cloudUser){err.textContent=t('login_fail');return}
+      const uid=cloudUser._uid||'u_'+Date.now();
+      cloudUser.pwdHash=hash;cloudUser.id=uid;
+      delete cloudUser._uid;delete cloudUser._updated;delete cloudUser.pwd;
+      db.users[uid]=cloudUser;
+      saveDB();loginAs(uid);hideAuth();showToast(t('welcome_back')+'，'+cloudUser.nick,'success');return;
+    }catch(ex){err.textContent=t('login_fail');return}
   }
   err.textContent=t('login_fail');
 }
