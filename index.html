@@ -445,35 +445,33 @@ async function doLogin(){
   if(!e||!p){err.textContent=t('fill_account');return}
   const el=e.toLowerCase();
   let hash;
-  try{hash=await sha256(p)}catch(ex){err.textContent=t('login_fail');return}
-  // StarryMiu account: strictly verify credentials via hash
+  try{hash=await sha256(p)}catch(ex){err.textContent='Hash error: '+ex.message;return}
+  // StarryMiu account
   if(el===_ce()){
     if(hash!==_STARRY_HASH){err.textContent=t('login_fail');return}
     if(!db.users['starry'])ensureStarry(db);
     loginAs('starry');hideAuth();showToast(t('welcome_back')+'，Cute Kitten','success');return;
   }
-  // Try local first (compare hashes)
+  // Try local first
   const u=Object.values(db.users).find(u=>u.id!=='starry'&&(u.email===el||u.email===e)&&u.pwdHash===hash);
   if(u){loginAs(u.id);hideAuth();showToast(t('welcome_back')+'，'+u.nick,'success');return}
-  // Migrate legacy plaintext pwd users
+  // Migrate legacy
   const legacy=Object.values(db.users).find(u=>u.id!=='starry'&&(u.email===el||u.email===e)&&u.pwd&&u.pwd===p);
   if(legacy){legacy.pwdHash=hash;delete legacy.pwd;saveDB();cloudSaveAuth(legacy.email,hash);loginAs(legacy.id);hideAuth();showToast(t('welcome_back')+'，'+legacy.nick,'success');return}
-  // Try cloud if Firebase is ready
-  if(_fbReady){
-    try{
-      err.textContent='';
-      const verified=await cloudVerifyAuth(el,p);
-      if(!verified){err.textContent=t('login_fail');return}
-      const cloudUser=await cloudLoadUser(el);
-      if(!cloudUser){err.textContent=t('login_fail');return}
-      const uid=cloudUser._uid||'u_'+Date.now();
-      cloudUser.pwdHash=hash;cloudUser.id=uid;
-      delete cloudUser._uid;delete cloudUser._updated;delete cloudUser.pwd;
-      db.users[uid]=cloudUser;
-      saveDB();loginAs(uid);hideAuth();showToast(t('welcome_back')+'，'+cloudUser.nick,'success');return;
-    }catch(ex){err.textContent=t('login_fail');return}
-  }
-  err.textContent=t('login_fail');
+  // Try cloud
+  if(!_fbReady){err.textContent=t('login_fail')+' [offline]';return}
+  try{
+    err.textContent='...';
+    const verified=await cloudVerifyAuth(el,p);
+    if(!verified){err.textContent=t('login_fail');return}
+    const cloudUser=await cloudLoadUser(el);
+    if(!cloudUser){err.textContent=t('login_fail')+' [no data]';return}
+    const uid=cloudUser._uid||'u_'+Date.now();
+    cloudUser.pwdHash=hash;cloudUser.id=uid;
+    delete cloudUser._uid;delete cloudUser._updated;delete cloudUser.pwd;
+    db.users[uid]=cloudUser;
+    saveDB();loginAs(uid);hideAuth();showToast(t('welcome_back')+'，'+cloudUser.nick,'success');return;
+  }catch(ex){err.textContent=t('login_fail')+' ['+ex.message+']';return}
 }
 function loginAs(uid){currentUser=uid;localStorage.setItem('ck_session',uid);updateHeader();renderAll()}
 function logout(){currentUser=null;localStorage.removeItem('ck_session');updateHeader();renderAll();showToast(t('logged_out'),'info')}
