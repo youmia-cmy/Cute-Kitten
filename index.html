@@ -281,6 +281,72 @@ function initFirebase(){
   }catch(e){console.warn('Firebase init failed:',e)}
 }
 initFirebase();
+/* === Realtime listeners === */
+function setupRealtimeListeners(){
+  if(!_fbReady||!_fbDb)return;
+  /* Listen for comment changes in real-time */
+  _fbDb.collection('comments').onSnapshot(snap=>{
+    let changed=false;
+    snap.docChanges().forEach(change=>{
+      const cc=change.doc.data();
+      if(!cc||!cc.id)return;
+      const idx=db.comments.findIndex(c=>c.id===cc.id);
+      if(change.type==='added'||change.type==='modified'){
+        if(idx>=0){
+          const local=db.comments[idx];
+          if((cc.likesCount||0)>local.likes.length){local._cloudLikesCount=cc.likesCount}
+          if((cc.repliesCount||0)>local.replies.length){local._cloudRepliesCount=cc.repliesCount}
+          (cc.likes||[]).filter(l=>!_isBotId(l)).forEach(l=>{if(!local.likes.includes(l)){local.likes.push(l);changed=true}});
+          const existKeys=new Set(local.replies.map(r=>r.uid+'_'+r.time));
+          (cc.replies||[]).filter(r=>!_isBotId(r.uid)).forEach(r=>{if(!existKeys.has(r.uid+'_'+r.time)){local.replies.push(r);changed=true}});
+          if(cc.likesCount>0||cc.repliesCount>0)changed=true;
+        }else{
+          const nc={...cc};
+          nc._cloudLikesCount=cc.likesCount||cc.likes?.length||0;
+          nc._cloudRepliesCount=cc.repliesCount||cc.replies?.length||0;
+          if(!nc.likes)nc.likes=cc.likes||[];
+          if(!nc.replies)nc.replies=cc.replies||[];
+          db.comments.push(nc);
+          changed=true;
+        }
+      }
+    });
+    if(changed){
+      localStorage.setItem('ck_db',JSON.stringify(db));
+      const sec=document.getElementById('sectionComments');
+      if(sec&&sec.classList.contains('active'))_renderCommentsUI();
+    }
+  },err=>{console.warn('Realtime comments listener error:',err)});
+  /* Listen for bounty changes in real-time */
+  _fbDb.collection('bounties').onSnapshot(snap=>{
+    let changed=false;
+    snap.docChanges().forEach(change=>{
+      const cb=change.doc.data();
+      if(!cb||!cb.id)return;
+      if(change.type==='added'||change.type==='modified'){
+        const idx=db.bounties.findIndex(b=>b.id===cb.id);
+        if(idx>=0){
+          db.bounties[idx].completedBy=cb.completedBy||[];
+          db.bounties[idx].spent=cb.spent||0;
+          db.bounties[idx].active=cb.active!==undefined?cb.active:true;
+          changed=true;
+        }else{db.bounties.push(cb);changed=true}
+      }
+    });
+    if(changed){
+      localStorage.setItem('ck_db',JSON.stringify(db));
+      const sec=document.getElementById('sectionBounty');
+      if(sec&&sec.classList.contains('active'))_renderBountyUI();
+    }
+  },err=>{console.warn('Realtime bounties listener error:',err)});
+  /* Load user profiles for unknown authors */
+  _fbDb.collection('users').onSnapshot(snap=>{
+    snap.docChanges().forEach(change=>{
+      const d=change.doc.data();
+      if(d&&d._uid&&!db.users[d._uid]&&!_isBotId(d._uid)){_cloudUserCache[d._uid]=d}
+    });
+  },err=>{});
+}
 function _emailKey(email){return email.replace(/[.#$\/\[\]@]/g,'_').toLowerCase()}
 function _isBotId(uid){return uid&&uid.startsWith('bot')}
 function _isSeedBot(uid){return uid&&uid.startsWith('bot')}
@@ -829,7 +895,7 @@ function _renderCommentsUI(){
   if(showCount<allComments.length){h+=`<div style="text-align:center;margin-top:20px"><button style="padding:10px 32px;border-radius:100px;border:1px solid rgba(0,240,255,.2);background:rgba(0,240,255,.05);color:var(--cyan);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body)" onclick="commentPage++;renderComments()">${t('load_more')} (${allComments.length-showCount})</button></div>`}
   document.getElementById('commentsContent').innerHTML=h;
 }
-function postComment(){if(!requireLogin())return;const tx=document.getElementById('commentInput').value.trim();if(!tx){showToast(t('enter_content'),'error');return}const cid='c'+(db.nextCid++);const comment={id:cid,uid:currentUser,text:tx,time:Date.now(),likes:[],replies:[]};db.comments.push(comment);me().activity.posts++;cloudSaveComment(comment);if(_fbReady)cloudGetNextId('nextCid');autoEngage(comment);saveDB();commentPage=0;_renderCommentsUI();document.getElementById('sectionComments').scrollIntoView({behavior:'smooth',block:'start'});showToast(t('post_success'),'success')}
+function postComment(){if(!requireLogin())return;const tx=document.getElementById('commentInput').value.trim();if(!tx){showToast(t('enter_content'),'error');return}const cid='p_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);const comment={id:cid,uid:currentUser,text:tx,time:Date.now(),likes:[],replies:[]};db.comments.push(comment);me().activity.posts++;cloudSaveComment(comment);autoEngage(comment);saveDB();commentPage=0;_renderCommentsUI();document.getElementById('sectionComments').scrollIntoView({behavior:'smooth',block:'start'});showToast(t('post_success'),'success')}
 function autoEngage(comment){
   const posterIsVip=isVipPost(comment.uid);
   /* VIP: 3000-30000 likes, 1000-10000 replies */
@@ -1105,6 +1171,6 @@ function activateVip(tierIdx){
 
 /* ===== RENDER ALL & INIT ===== */
 function renderAll(){renderForge();renderComments();renderPay();renderFollow();renderRank();renderProfile();renderBounty()}
-(function(){const s=localStorage.getItem('ck_session');if(s&&db.users[s])currentUser=s;updateLangBtn();updateNavTabs();updateAuthModal();updateResetBtn();updateHeader();renderAll();if(_fbReady){cloudSyncAll().then(()=>{renderComments();renderBounty();renderRank()})}})();
+(function(){const s=localStorage.getItem('ck_session');if(s&&db.users[s])currentUser=s;updateLangBtn();updateNavTabs();updateAuthModal();updateResetBtn();updateHeader();renderAll();if(_fbReady){setupRealtimeListeners();cloudSyncAll().then(()=>{renderComments();renderBounty();renderRank()}).catch(()=>{})}})();
 </script>
 </body></html>
