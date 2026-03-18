@@ -916,8 +916,13 @@ async function renderComments(skipCloud){
 function _renderCommentsUI(){
   const pageSize=30;
   let h=`<h2 class="sec-title">${t('comments_title')}</h2><p class="sec-desc">${t('comments_desc')}</p>`;
-  h+=`<div id="cloudSyncStatus" style="text-align:center;font-size:11px;color:#888;margin-bottom:8px;font-family:monospace"></div>`;
-  const u=me();const allComments=[...db.comments].sort((a,b)=>{const aVip=isVipPost(a.uid),bVip=isVipPost(b.uid);if(aVip&&!bVip)return -1;if(!aVip&&bVip)return 1;return b.time-a.time});
+  const u=me();const allComments=[...db.comments].sort((a,b)=>{
+    const aVip=isVipPost(a.uid),bVip=isVipPost(b.uid);
+    if(aVip&&!bVip)return -1;if(!aVip&&bVip)return 1;
+    const aBot=_isBotId(a.uid),bBot=_isBotId(b.uid);
+    if(!aBot&&bBot)return -1;if(aBot&&!bBot)return 1;
+    return b.time-a.time;
+  });
   if(u){
     h+=`<div class="comment-composer"><textarea class="comment-textarea" id="commentInput" placeholder="${t('post_ph')}"></textarea><button class="comment-post-btn" onclick="postComment()">${t('post_btn')}${checkVip(u)?' ✨':''}</button></div>`;
   }else h+=`<div style="text-align:center;padding:16px;color:var(--text-dim);margin-bottom:20px">${t('login_to_post')}</div>`;
