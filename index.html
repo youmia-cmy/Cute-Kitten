@@ -586,7 +586,29 @@ async function cloudSyncAll(){
     await cloudSyncComments();
     /* load cloud bounties and merge */
     await cloudSyncBounties();
-    /* load current user from cloud if logged in */
+    /* load ALL cloud user profiles and merge VIP/title/nick info */
+    try{
+      const uSnap=await _fbDb.collection('users').get();
+      uSnap.forEach(doc=>{
+        const d=doc.data();if(!d||!d._uid||_isBotId(d._uid))return;
+        const uid=d._uid;
+        if(db.users[uid]){
+          /* Merge cloud VIP/title/nick/avatar into local user (cloud wins for display fields) */
+          const local=db.users[uid];
+          if(d.vip)local.vip=d.vip;
+          if(d.vipExpiry)local.vipExpiry=d.vipExpiry;
+          if(d.equippedTitle)local.equippedTitle=d.equippedTitle;
+          if(d.equippedRank!==undefined)local.equippedRank=d.equippedRank;
+          if(d.nick)local.nick=d.nick;
+          if(d.avatar)local.avatar=d.avatar;
+          if(d.titles&&d.titles.length)local.titles=d.titles;
+          if(d.customTitles&&d.customTitles.length)local.customTitles=d.customTitles;
+        }else{
+          _cloudUserCache[uid]=d;
+        }
+      });
+    }catch(e){console.warn('Cloud user sync failed:',e)}
+    /* Also update current user from cloud */
     if(currentUser&&currentUser!=='starry'){
       const u=db.users[currentUser];
       if(u&&u.email){
