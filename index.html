@@ -88,9 +88,7 @@ select.auth-input,select.profile-input{appearance:auto;background:rgba(255,255,2
 .game-menu-btn{padding:12px 36px;border-radius:100px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition:all .3s}
 .game-menu-btn:hover{background:rgba(0,240,255,.1);border-color:var(--cyan);color:var(--cyan)}
 .game-menu-btn.primary{border:none;background:linear-gradient(135deg,var(--cyan),var(--purple));color:#fff}
-.game-fullscreen-btn{display:none;margin:10px auto;padding:12px 28px;border-radius:100px;border:1px solid rgba(0,240,255,.3);background:linear-gradient(135deg,rgba(0,240,255,.15),rgba(168,85,247,.15));color:var(--cyan);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-body);text-align:center}
 @media(max-width:640px){
-  .game-fullscreen-btn{display:block}
   .game-wrapper{border:1px solid rgba(0,240,255,.15)}
   .game-wrapper canvas{height:180px;object-fit:contain;background:#111}
   .game-hud{padding:4px 8px;font-size:10px}
@@ -114,8 +112,6 @@ select.auth-input,select.profile-input{appearance:auto;background:rgba(255,255,2
 .game-wrapper.fullscreen-mode .game-menu{z-index:7}
 .game-wrapper.fullscreen-mode .game-menu h2{font-size:22px}
 .game-wrapper.fullscreen-mode .game-menu-btn{padding:10px 30px;font-size:14px}
-.game-wrapper.fullscreen-mode .game-fs-exit{display:block!important;position:absolute;top:6px;right:6px;z-index:10;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.7);color:#fff;font-size:11px;cursor:pointer}
-.game-fs-exit{display:none}
 .game-keys{font-size:11px;color:var(--text-dim);text-align:center;line-height:1.8;margin-top:8px}
 .level-select{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:16px;width:90%;max-width:500px}
 .level-card{padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);text-align:center;cursor:pointer;transition:all .3s}
@@ -755,8 +751,7 @@ function renderGame(){
   const u=me();
   let h=`<h2 class="sec-title">${t('game_title')}</h2><p class="sec-desc">${t('game_desc')}</p>`;
   if(!u){h+=`<div style="text-align:center;padding:40px;color:var(--text-dim)">${t('please_login')}</div>`;document.getElementById('gameContent').innerHTML=h;return}
-  h+=`<div class="game-wrapper" id="gameWrapper"><button class="game-fs-exit" id="gameFsExit" onclick="exitGameFullscreen()">✕ 退出全屏</button><canvas id="gameCanvas" width="800" height="400"></canvas><div class="game-hud"><div style="display:flex;align-items:center;gap:8px"><span>HP</span><div class="hp-bar"><div class="hp-fill" id="hpFill" style="width:100%"></div></div></div><div id="hudInfo">LEVEL 1</div><div id="hudScore">SCORE: 0</div></div><div class="game-controls"><div class="dpad"><button class="gbtn" id="bl" ontouchstart="gk.left=true" ontouchend="gk.left=false">&#9664;</button><button class="gbtn" id="br" ontouchstart="gk.right=true" ontouchend="gk.right=false">&#9654;</button></div><div class="actions"><button class="gbtn jump" id="bjmp" ontouchstart="gk.jump=true" ontouchend="gk.jump=false">&#8593;</button><button class="gbtn fire" id="bfire" ontouchstart="gk.fire=true" ontouchend="gk.fire=false">&#9679;</button></div></div><div class="game-menu" id="gameMenu"></div></div>`;
-  h+=`<button class="game-fullscreen-btn" onclick="enterGameFullscreen()">&#x26F6; 横屏全屏模式</button>`;
+  h+=`<div class="game-wrapper" id="gameWrapper"><canvas id="gameCanvas" width="800" height="400"></canvas><div class="game-hud"><div style="display:flex;align-items:center;gap:8px"><span>HP</span><div class="hp-bar"><div class="hp-fill" id="hpFill" style="width:100%"></div></div></div><div id="hudInfo">LEVEL 1</div><div id="hudScore">SCORE: 0</div></div><div class="game-controls"><div class="dpad"><button class="gbtn" id="bl" ontouchstart="gk.left=true" ontouchend="gk.left=false">&#9664;</button><button class="gbtn" id="br" ontouchstart="gk.right=true" ontouchend="gk.right=false">&#9654;</button></div><div class="actions"><button class="gbtn jump" id="bjmp" ontouchstart="gk.jump=true" ontouchend="gk.jump=false">&#8593;</button><button class="gbtn fire" id="bfire" ontouchstart="gk.fire=true" ontouchend="gk.fire=false">&#9679;</button></div></div><div class="game-menu" id="gameMenu"></div></div>`;
   h+=`<div class="game-keys">${t('game_keys')}</div>`;
   document.getElementById('gameContent').innerHTML=h;
   initGame();
