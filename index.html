@@ -295,6 +295,14 @@ const FIREBASE_CONFIG={
   appId:"1:528827336981:web:76464c11c3c6fff921411c"
 };
 let _fbReady=false,_fbDb=null;
+/* --- Cloud sync status (visible debug) --- */
+let _cloudStatus={fb:false,saved:0,loaded:0,errors:[]};
+function _updateCloudStatus(){
+  const el=document.getElementById('cloudSyncStatus');
+  if(!el)return;
+  const ok=_cloudStatus.fb;
+  el.innerHTML=`<span style="color:${ok?'#0f0':'#f44'}">● ${ok?'Cloud':'Offline'}</span> | <span>↑${_cloudStatus.saved}</span> | <span>↓${_cloudStatus.loaded}</span>${_cloudStatus.errors.length?` | <span style="color:#f44">${_cloudStatus.errors[_cloudStatus.errors.length-1]}</span>`:''}`;
+}
 function initFirebase(){
   try{
     if(FIREBASE_CONFIG.apiKey==='YOUR_API_KEY')return;
@@ -410,14 +418,6 @@ async function cloudVerifyAuth(email,pwd){
     const h=await sha256(pwd);
     return d.hash===h;
   }catch(e){return false}
-}
-/* --- Cloud sync status (visible debug) --- */
-let _cloudStatus={fb:false,saved:0,loaded:0,errors:[]};
-function _updateCloudStatus(){
-  const el=document.getElementById('cloudSyncStatus');
-  if(!el)return;
-  const ok=_cloudStatus.fb;
-  el.innerHTML=`<span style="color:${ok?'#0f0':'#f44'}">● ${ok?'Cloud':'Offline'}</span> | <span>↑${_cloudStatus.saved}</span> | <span>↓${_cloudStatus.loaded}</span>${_cloudStatus.errors.length?` | <span style="color:#f44">${_cloudStatus.errors[_cloudStatus.errors.length-1]}</span>`:''}`;
 }
 /* --- Comment operations --- */
 async function cloudSaveComment(comment){
