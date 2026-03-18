@@ -122,7 +122,7 @@ select.auth-input,select.profile-input{appearance:auto;background:rgba(255,255,2
 @keyframes vipRingSpin{to{transform:rotate(360deg)}}
 @keyframes mirrorShine{0%,100%{left:-60%;opacity:0}50%{left:110%;opacity:1}}
 .toast-container{position:fixed;top:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:6px}.toast{padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;background:var(--bg-card);border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 30px rgba(0,0,0,.4);animation:toastIn .4s;display:flex;align-items:center;gap:8px}.toast.success{border-color:rgba(0,255,136,.3)}.toast.error{border-color:rgba(255,68,68,.3)}.toast.info{border-color:rgba(0,240,255,.3)}@keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
-@media(max-width:640px){header{padding:12px}nav{padding:10px 8px 0;flex-direction:column;align-items:stretch;gap:6px}.nav-tab{padding:10px 16px;font-size:12px;text-align:center;width:100%}main{padding:16px 12px 40px}.forge-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}}
+@media(max-width:640px){header{padding:12px}nav{padding:10px 8px 0}.nav-tab{padding:8px 12px;font-size:11px}main{padding:16px 12px 40px}.forge-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}}
 </style>
 </head>
 <body>
@@ -295,21 +295,12 @@ const FIREBASE_CONFIG={
   appId:"1:528827336981:web:76464c11c3c6fff921411c"
 };
 let _fbReady=false,_fbDb=null;
-/* --- Cloud sync status (visible debug) --- */
-let _cloudStatus={fb:false,saved:0,loaded:0,errors:[]};
-function _updateCloudStatus(){
-  const el=document.getElementById('cloudSyncStatus');
-  if(!el)return;
-  const ok=_cloudStatus.fb;
-  el.innerHTML=`<span style="color:${ok?'#0f0':'#f44'}">● ${ok?'Cloud':'Offline'}</span> | <span>↑${_cloudStatus.saved}</span> | <span>↓${_cloudStatus.loaded}</span>${_cloudStatus.errors.length?` | <span style="color:#f44">${_cloudStatus.errors[_cloudStatus.errors.length-1]}</span>`:''}`;
-}
 function initFirebase(){
   try{
     if(FIREBASE_CONFIG.apiKey==='YOUR_API_KEY')return;
     const app=firebase.initializeApp(FIREBASE_CONFIG);
     _fbDb=firebase.firestore();
     _fbReady=true;
-    _cloudStatus.fb=true;_updateCloudStatus();
   }catch(e){console.warn('Firebase init failed:',e)}
 }
 initFirebase();
@@ -426,8 +417,7 @@ async function cloudSaveComment(comment){
   try{
     const data={id:comment.id,uid:comment.uid,text:comment.text,time:comment.time,likes:comment.likes||[],replies:comment.replies||[]};
     await _fbDb.collection('comments').doc(comment.id).set(data,{merge:true});
-    _cloudStatus.saved++;_updateCloudStatus();
-  }catch(e){_cloudStatus.errors.push('Save:'+e.message);_updateCloudStatus();console.warn('Cloud save comment failed:',e);throw e}
+  }catch(e){console.warn('Cloud save comment failed:',e)}
 }
 /* Save comment with full engagement data (after autoEngage completes) */
 async function cloudSaveCommentFull(comment){
@@ -452,11 +442,11 @@ async function cloudLoadComments(){
   try{
     const snap=await _fbDb.collection('comments').get({source:'server'});
     const out=[];snap.forEach(doc=>out.push(doc.data()));
-    _cloudStatus.loaded=out.length;_updateCloudStatus();
     return out;
   }catch(e){
+    /* Fallback to default (possibly cached) if server fetch fails */
     console.warn('Cloud load comments from server failed, trying default:',e);
-    try{const snap=await _fbDb.collection('comments').get();const out=[];snap.forEach(doc=>out.push(doc.data()));_cloudStatus.loaded=out.length;_updateCloudStatus();return out}catch(e2){_cloudStatus.errors.push('Load:'+e2.message);_updateCloudStatus();console.warn('Cloud load comments failed:',e2);return[]}
+    try{const snap=await _fbDb.collection('comments').get();const out=[];snap.forEach(doc=>out.push(doc.data()));return out}catch(e2){console.warn('Cloud load comments failed:',e2);return[]}
   }
 }
 async function cloudUpdateComment(cid,data){
@@ -916,7 +906,6 @@ async function renderComments(skipCloud){
 function _renderCommentsUI(){
   const pageSize=30;
   let h=`<h2 class="sec-title">${t('comments_title')}</h2><p class="sec-desc">${t('comments_desc')}</p>`;
-  h+=`<div id="cloudSyncStatus" style="text-align:center;font-size:11px;color:#888;margin-bottom:8px;font-family:monospace"></div>`;
   const u=me();const allComments=[...db.comments].sort((a,b)=>{const aVip=isVipPost(a.uid),bVip=isVipPost(b.uid);if(aVip&&!bVip)return -1;if(!aVip&&bVip)return 1;return b.time-a.time});
   if(u){
     h+=`<div class="comment-composer"><textarea class="comment-textarea" id="commentInput" placeholder="${t('post_ph')}"></textarea><button class="comment-post-btn" onclick="postComment()">${t('post_btn')}${checkVip(u)?' ✨':''}</button></div>`;
@@ -942,7 +931,6 @@ function _renderCommentsUI(){
   const _savedText=_prevInput?_prevInput.value:'';
   document.getElementById('commentsContent').innerHTML=h;
   if(_savedText){const _newInput=document.getElementById('commentInput');if(_newInput)_newInput.value=_savedText}
-  _updateCloudStatus();
 }
 async function postComment(){if(!requireLogin())return;const tx=document.getElementById('commentInput').value.trim();if(!tx){showToast(t('enter_content'),'error');return}const cid='p_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);const comment={id:cid,uid:currentUser,text:tx,time:Date.now(),likes:[],replies:[]};db.comments.push(comment);me().activity.posts++;saveDB();commentPage=0;_renderCommentsUI();document.getElementById('sectionComments').scrollIntoView({behavior:'smooth',block:'start'});showToast(t('post_success'),'success');/* Save to cloud with retry */try{await cloudSaveComment(comment)}catch(e){console.warn('Initial cloud save failed, retrying...',e);try{await cloudSaveComment(comment)}catch(e2){console.warn('Cloud save retry also failed:',e2)}}autoEngage(comment)}
 function autoEngage(comment,skipCloudSave){
