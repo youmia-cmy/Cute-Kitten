@@ -104,13 +104,14 @@ select.auth-input,select.profile-input{appearance:auto;background:rgba(255,255,2
   .level-select{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px}
   .level-card{padding:8px;font-size:12px}
 }
-/* Fullscreen landscape game mode */
-.game-wrapper.fullscreen-mode{position:fixed!important;inset:0!important;z-index:9999!important;max-width:none!important;border-radius:0!important;border:none!important;width:100vw!important;height:100vh!important;display:flex!important;flex-direction:column!important;background:#000!important}
-.game-wrapper.fullscreen-mode canvas{flex:1!important;width:100%!important;height:auto!important;object-fit:contain!important}
-.game-wrapper.fullscreen-mode .game-hud{flex-shrink:0;padding:6px 12px;font-size:12px}
+/* Fullscreen game mode — controls overlay on canvas */
+.game-wrapper.fullscreen-mode{position:fixed!important;inset:0!important;z-index:9999!important;max-width:none!important;border-radius:0!important;border:none!important;width:100vw!important;height:100vh!important;background:#000!important}
+.game-wrapper.fullscreen-mode canvas{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:contain!important}
+.game-wrapper.fullscreen-mode .game-hud{position:absolute!important;top:0;left:0;right:0;z-index:6;background:rgba(0,0,0,.5)!important;padding:6px 12px;font-size:12px}
 .game-wrapper.fullscreen-mode .game-hud .hp-bar{width:100px;height:8px}
-.game-wrapper.fullscreen-mode .game-controls{flex-shrink:0;padding:8px 20px}
-.game-wrapper.fullscreen-mode .gbtn{width:54px;height:54px;font-size:20px}
+.game-wrapper.fullscreen-mode .game-controls{position:absolute!important;bottom:0;left:0;right:0;z-index:6;background:rgba(0,0,0,.3)!important;padding:10px 20px;border-radius:0!important}
+.game-wrapper.fullscreen-mode .gbtn{width:54px;height:54px;font-size:20px;background:rgba(255,255,255,.1)!important}
+.game-wrapper.fullscreen-mode .game-menu{z-index:7}
 .game-wrapper.fullscreen-mode .game-menu h2{font-size:22px}
 .game-wrapper.fullscreen-mode .game-menu-btn{padding:10px 30px;font-size:14px}
 .game-wrapper.fullscreen-mode .game-fs-exit{display:block!important;position:absolute;top:6px;right:6px;z-index:10;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.7);color:#fff;font-size:11px;cursor:pointer}
