@@ -307,7 +307,7 @@ function loadDB(){
   }catch{return defaultDB();}
 }
 function ensureStarry(d){if(!d.users['starry']){d.users['starry']={id:'starry',nick:'Cute Kitten',email:_ce(),pwdHash:_STARRY_HASH,bio:'✨ Creator',gender:'female',vip:true,vipExpiry:'permanent',balance:10000000,avatar:CK_AVATAR,titles:[{name:'大帝',flavor:'万古唯一，至高无上',rank:6}],equippedTitle:'大帝',equippedRank:6,forgeCount:0,activity:{posts:500,replies:1200,likes:8000},customTitles:[],gameSave:{clearedLevels:[],bestScores:{}}}}else{d.users['starry'].email=_ce();d.users['starry'].pwdHash=_STARRY_HASH;delete d.users['starry'].pwd;d.users['starry'].vip=true;d.users['starry'].vipExpiry='permanent'}_initTestAccounts(d.users);if(!d.bounties)d.bounties=[{id:'bty1',uid:'starry',type:'follow',targetUrl:'https://x.com/_StarryMiu',targetName:'CuteKitten',reward:0.1,budget:2000,spent:0,completedBy:[],text:'关注CuteKitten，可获得$喔。限量2000$。',time:Date.now()-86400000,active:true}];if(!d.nextBid)d.nextBid=100;if(!d.nextCid||d.nextCid<2000)d.nextCid=2000}
-function saveDB(){localStorage.setItem('ck_db',JSON.stringify(db));if(_fbReady&&currentUser){cloudSaveUser(currentUser)}}
+function saveDB(){if(currentUser&&db.users[currentUser]){db.users[currentUser]._updated=Date.now()}localStorage.setItem('ck_db',JSON.stringify(db));if(_fbReady&&currentUser){cloudSaveUser(currentUser)}}
 
 /* ===== FIREBASE CLOUD SYNC ===== */
 const FIREBASE_CONFIG={
@@ -627,6 +627,7 @@ async function cloudSyncAll(){
           if(d.avatar)local.avatar=d.avatar;
           if(d.titles&&d.titles.length)local.titles=d.titles;
           if(d.customTitles&&d.customTitles.length)local.customTitles=d.customTitles;
+          if(d.balance!==undefined&&d._updated){if(!local._updated||d._updated>=local._updated){local.balance=d.balance;local._updated=d._updated}}
         }else{
           _cloudUserCache[uid]=d;
         }
