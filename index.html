@@ -88,14 +88,32 @@ select.auth-input,select.profile-input{appearance:auto;background:rgba(255,255,2
 .game-menu-btn{padding:12px 36px;border-radius:100px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition:all .3s}
 .game-menu-btn:hover{background:rgba(0,240,255,.1);border-color:var(--cyan);color:var(--cyan)}
 .game-menu-btn.primary{border:none;background:linear-gradient(135deg,var(--cyan),var(--purple));color:#fff}
-.game-fullscreen-btn{display:none;margin:8px auto;padding:10px 24px;border-radius:100px;border:1px solid rgba(0,240,255,.3);background:linear-gradient(135deg,rgba(0,240,255,.1),rgba(168,85,247,.1));color:var(--cyan);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);text-align:center}
-@media(max-width:640px){.game-fullscreen-btn{display:block}}
-.game-wrapper.fullscreen-mode{position:fixed!important;inset:0!important;z-index:9999!important;max-width:none!important;border-radius:0!important;border:none!important;width:100vw!important;height:100vh!important;display:flex;flex-direction:column}
-.game-wrapper.fullscreen-mode canvas{flex:1;width:100%!important;height:auto!important;object-fit:contain}
-.game-wrapper.fullscreen-mode .game-hud{flex-shrink:0}
-.game-wrapper.fullscreen-mode .game-controls{flex-shrink:0;padding:8px 16px}
-.game-wrapper.fullscreen-mode .game-controls .gbtn{width:56px;height:56px;font-size:22px}
-.game-wrapper.fullscreen-mode .game-fs-exit{display:block;position:absolute;top:8px;right:8px;z-index:10;padding:6px 14px;border-radius:100px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.6);color:#fff;font-size:12px;cursor:pointer}
+.game-fullscreen-btn{display:none;margin:10px auto;padding:12px 28px;border-radius:100px;border:1px solid rgba(0,240,255,.3);background:linear-gradient(135deg,rgba(0,240,255,.15),rgba(168,85,247,.15));color:var(--cyan);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-body);text-align:center}
+@media(max-width:640px){
+  .game-fullscreen-btn{display:block}
+  .game-wrapper{border:1px solid rgba(0,240,255,.15)}
+  .game-wrapper canvas{height:180px;object-fit:contain;background:#111}
+  .game-hud{padding:4px 8px;font-size:10px}
+  .game-hud .hp-bar{width:60px;height:6px}
+  .game-controls{padding:6px 8px}
+  .gbtn{width:40px;height:40px;font-size:16px;border-radius:10px}
+  .game-menu{gap:10px}
+  .game-menu h2{font-size:18px}
+  .game-menu-btn{padding:8px 20px;font-size:12px}
+  .game-keys{font-size:9px}
+  .level-select{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px}
+  .level-card{padding:8px;font-size:12px}
+}
+/* Fullscreen landscape game mode */
+.game-wrapper.fullscreen-mode{position:fixed!important;inset:0!important;z-index:9999!important;max-width:none!important;border-radius:0!important;border:none!important;width:100vw!important;height:100vh!important;display:flex!important;flex-direction:column!important;background:#000!important}
+.game-wrapper.fullscreen-mode canvas{flex:1!important;width:100%!important;height:auto!important;object-fit:contain!important}
+.game-wrapper.fullscreen-mode .game-hud{flex-shrink:0;padding:6px 12px;font-size:12px}
+.game-wrapper.fullscreen-mode .game-hud .hp-bar{width:100px;height:8px}
+.game-wrapper.fullscreen-mode .game-controls{flex-shrink:0;padding:8px 20px}
+.game-wrapper.fullscreen-mode .gbtn{width:54px;height:54px;font-size:20px}
+.game-wrapper.fullscreen-mode .game-menu h2{font-size:22px}
+.game-wrapper.fullscreen-mode .game-menu-btn{padding:10px 30px;font-size:14px}
+.game-wrapper.fullscreen-mode .game-fs-exit{display:block!important;position:absolute;top:6px;right:6px;z-index:10;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.7);color:#fff;font-size:11px;cursor:pointer}
 .game-fs-exit{display:none}
 .game-keys{font-size:11px;color:var(--text-dim);text-align:center;line-height:1.8;margin-top:8px}
 .level-select{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:16px;width:90%;max-width:500px}
@@ -749,29 +767,48 @@ document.addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='a')gk.lef
 function enterGameFullscreen(){
   const w=document.getElementById('gameWrapper');if(!w)return;
   w.classList.add('fullscreen-mode');
-  const exit=document.getElementById('gameFsExit');if(exit)exit.style.display='block';
   /* Try native fullscreen API */
-  const el=w;
-  if(el.requestFullscreen)el.requestFullscreen().catch(()=>{});
-  else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();
+  if(w.requestFullscreen)w.requestFullscreen().catch(()=>{});
+  else if(w.webkitRequestFullscreen)w.webkitRequestFullscreen();
   /* Try to lock orientation to landscape */
   try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(()=>{})}catch(e){}
-  /* Resize canvas to fill */
-  setTimeout(()=>{
-    const cv=document.getElementById('gameCanvas');
-    if(cv){cv.style.width='100%';cv.style.height='auto'}
-  },200);
+  /* Resize canvas to match screen after orientation change */
+  setTimeout(_resizeGameCanvas,300);
+  setTimeout(_resizeGameCanvas,800);
 }
 function exitGameFullscreen(){
   const w=document.getElementById('gameWrapper');if(!w)return;
   w.classList.remove('fullscreen-mode');
-  const exit=document.getElementById('gameFsExit');if(exit)exit.style.display='none';
   if(document.exitFullscreen)document.exitFullscreen().catch(()=>{});
   else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
   try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock()}catch(e){}
+  /* Reset canvas size */
+  const cv=document.getElementById('gameCanvas');
+  if(cv){cv.style.width='';cv.style.height=''}
+}
+function _resizeGameCanvas(){
+  const cv=document.getElementById('gameCanvas');
+  const w=document.getElementById('gameWrapper');
+  if(!cv||!w||!w.classList.contains('fullscreen-mode'))return;
+  /* Let CSS flex handle it — just ensure canvas renders at proper resolution */
+  const rect=cv.getBoundingClientRect();
+  if(rect.width>0&&rect.height>0){
+    cv.width=Math.min(rect.width,800);
+    cv.height=Math.min(rect.height,400);
+  }
 }
 document.addEventListener('fullscreenchange',()=>{
-  if(!document.fullscreenElement){const w=document.getElementById('gameWrapper');if(w)w.classList.remove('fullscreen-mode');const exit=document.getElementById('gameFsExit');if(exit)exit.style.display='none';try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock()}catch(e){}}
+  if(!document.fullscreenElement){
+    const w=document.getElementById('gameWrapper');
+    if(w)w.classList.remove('fullscreen-mode');
+    try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock()}catch(e){}
+    const cv=document.getElementById('gameCanvas');
+    if(cv){cv.width=800;cv.height=400;cv.style.width='';cv.style.height=''}
+  }
+});
+window.addEventListener('resize',()=>{
+  const w=document.getElementById('gameWrapper');
+  if(w&&w.classList.contains('fullscreen-mode'))setTimeout(_resizeGameCanvas,100);
 });
 function initGame(){
   const cv=document.getElementById('gameCanvas');if(!cv)return;
