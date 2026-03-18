@@ -650,6 +650,7 @@ async function cloudSyncAll(){
   }catch(e){console.warn('Cloud sync failed:',e)}
 }
 function getUser(uid){return db.users[uid]||SEED_USERS.find(u=>u.id===uid)||_cloudUserCache[uid]||null}
+function _userAvatarHTML(user,uid,size){if(!user)return '';if(_isBotId(uid))return '';const s=size||28;if(user.avatar)return `<img src="${user.avatar}" style="width:${s}px;height:${s}px;border-radius:50%;object-fit:cover;flex-shrink:0">`;const letter=user.nick?user.nick.charAt(0):'?';const colors=['#00f0ff','#a855f7','#ff69b4','#4ade80','#f59e0b','#ef4444','#3b82f6'];const ci=Math.abs((uid||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0))%colors.length;const col=colors[ci];return `<div style="width:${s}px;height:${s}px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:${Math.round(s*0.5)}px;font-weight:700;color:${col};font-family:var(--font-display)">${letter}</div>`}
 const _cloudUserCache={};
 async function ensureCloudUsers(uids){
   if(!_fbReady||!_fbDb)return;
@@ -1028,8 +1029,8 @@ function _renderCommentsUI(){
     /* Use cloud counts if available (for cross-device sync) */
     const lc=Math.max(c.likes?c.likes.length:0, c._cloudLikesCount||0);
     const rc=Math.max(c.replies?c.replies.length:0, c._cloudRepliesCount||0);
-    const il=currentUser&&c.likes&&c.likes.includes(currentUser),av=a&&a.avatar?a.avatar:'',isExpanded=_expandedComments.has(c.id);
-    h+=`<div class="comment-item${isVip?' vip-post':''}"><div class="comment-header">${av?`<img src="${av}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0">`:''}<span class="comment-nick" style="${isVip?'color:#ff69b4':''}">${a?a.nick:t('anonymous')}</span>${tn?`<span class="comment-title-badge ${rk}">${tn}</span>`:''}${isVip?'<span class="vip-badge">VIP</span> <span class="pinned-badge">📌 '+t('pinned')+'</span>':''}<span class="comment-time">${timeAgo(c.time)}</span></div><div class="comment-body">${esc(c.text)}</div><div class="comment-actions"><button class="comment-action ${il?'liked':''}" onclick="likeComment('${c.id}')">&#9829; ${lc}</button><button class="comment-action" onclick="toggleReply('${c.id}')">&#9993; ${t('reply_text')} ${rc}</button>${rc>0?`<button class="comment-action" onclick="toggleExpand('${c.id}')" id="exp_${c.id}" style="margin-left:auto;font-size:11px;color:var(--cyan)">${isExpanded?t('collapse_replies'):t('expand_replies')+' ('+rc+')'}</button>`:''}</div>`;
+    const il=currentUser&&c.likes&&c.likes.includes(currentUser),av=_userAvatarHTML(a,c.uid,28),isExpanded=_expandedComments.has(c.id);
+    h+=`<div class="comment-item${isVip?' vip-post':''}"><div class="comment-header">${av}<span class="comment-nick" style="${isVip?'color:#ff69b4':''}">${a?a.nick:t('anonymous')}</span>${tn?`<span class="comment-title-badge ${rk}">${tn}</span>`:''}${isVip?'<span class="vip-badge">VIP</span> <span class="pinned-badge">📌 '+t('pinned')+'</span>':''}<span class="comment-time">${timeAgo(c.time)}</span></div><div class="comment-body">${esc(c.text)}</div><div class="comment-actions"><button class="comment-action ${il?'liked':''}" onclick="likeComment('${c.id}')">&#9829; ${lc}</button><button class="comment-action" onclick="toggleReply('${c.id}')">&#9993; ${t('reply_text')} ${rc}</button>${rc>0?`<button class="comment-action" onclick="toggleExpand('${c.id}')" id="exp_${c.id}" style="margin-left:auto;font-size:11px;color:var(--cyan)">${isExpanded?t('collapse_replies'):t('expand_replies')+' ('+rc+')'}</button>`:''}</div>`;
     if(c.replies&&c.replies.length)h+=`<div class="reply-box" id="rb_${c.id}" style="display:${isExpanded?'block':'none'}">${c.replies.map(r=>{const ra=getUser(r.uid),rr=ra&&ra.equippedRank>=0&&ra.equippedRank<RANKS.length?RANKS[ra.equippedRank].css:'';return`<div class="reply-item"><b>${ra?ra.nick:t('anonymous')}</b>${ra&&ra.equippedTitle?` <span class="${rr}" style="font-size:10px">[${ra.equippedTitle}]</span>`:''}: ${esc(r.text)} <span style="font-size:10px;color:var(--text-dim)">${timeAgo(r.time)}</span></div>`}).join('')}</div>`;
     if(showReplyFor===c.id&&currentUser)h+=`<div class="reply-input-row"><input class="reply-input" id="ri_${c.id}" placeholder="${t('reply_ph')}"><button class="reply-send" onclick="postReply('${c.id}')">${t('send')}</button></div>`;
     h+=`</div>`;
@@ -1190,9 +1191,9 @@ function _renderBountyUI(){
     const currentPeople=b.completedBy?b.completedBy.length:0;
     const progress=requiredPeople>0?(currentPeople/requiredPeople*100):0;
     const isActive=b.active&&currentPeople<requiredPeople;
-    const pAvatar=poster&&poster.avatar?poster.avatar:'';
+    const pAv=_userAvatarHTML(poster,b.uid,36);
     const pRk=poster&&poster.equippedRank>=0&&poster.equippedRank<RANKS.length?RANKS[poster.equippedRank].css:'';
-    h+=`<div class="bounty-item"><div class="bounty-header">${pAvatar?`<img src="${pAvatar}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0">`:''}<span style="font-weight:900;${poster&&poster.vip?'color:#ff69b4':'color:var(--text)'}">${poster?poster.nick:t('anonymous')}</span>${poster&&poster.equippedTitle?`<span class="comment-title-badge ${pRk}">${poster.equippedTitle}</span>`:''}${poster&&poster.vip?'<span class="vip-badge">VIP</span>':''}<span class="bounty-reward-tag">+${b.reward}$/人</span></div>`;
+    h+=`<div class="bounty-item"><div class="bounty-header">${pAv}<span style="font-weight:900;${poster&&poster.vip?'color:#ff69b4':'color:var(--text)'}">${poster?poster.nick:t('anonymous')}</span>${poster&&poster.equippedTitle?`<span class="comment-title-badge ${pRk}">${poster.equippedTitle}</span>`:''}${poster&&poster.vip?'<span class="vip-badge">VIP</span>':''}<span class="bounty-reward-tag">+${b.reward}$/人</span></div>`;
     h+=`<div style="font-size:14px;line-height:1.8;margin-bottom:10px">`;
     if(b.targetName){
       const parts=b.text.split(b.targetName);
