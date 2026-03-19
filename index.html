@@ -1419,98 +1419,178 @@ window.addEventListener('scroll', () => {
 });
 
 // ============ MOCK DATA ============
-const mockData = [
-  {
-    mbti: 'ENFP', mbtiName: '竞选者', mbtiNameEn: 'Campaigner',
-    mbtiDesc: '充满热情、创造力和社交能力的自由灵魂，总能找到微笑的理由。你的内心像烟花一样绽放，永远追逐下一个闪光的想法。',
-    mbtiDescEn: 'A free spirit full of passion, creativity and social energy, always finding reasons to smile. Your heart blooms like fireworks, forever chasing the next brilliant idea.',
-    mbtiTags: ['✦ 外向直觉', '♡ 情感丰富', '☆ 灵活变通'],
-    mbtiTagsEn: ['✦ Extraverted Intuition', '♡ Emotionally Rich', '☆ Flexible'],
-    enneagram: 'Type 7 - 享乐主义者', enneagramEn: 'Type 7 - The Enthusiast',
-    enneagramDesc: '你是天生的冒险家和乐观主义者，永远在追寻新的体验和可能性。内心深处害怕被困住或感到痛苦，所以总在寻找下一段精彩旅程。',
-    enneagramDescEn: 'You are a natural adventurer and optimist, always seeking new experiences and possibilities. Deep down you fear being trapped or feeling pain, so you keep searching for the next exciting journey.',
-    enneagramTags: ['🎪 热爱自由', '🌈 多才多艺', '🦋 随性自在'],
-    enneagramTagsEn: ['🎪 Freedom Lover', '🌈 Versatile', '🦋 Carefree'],
-    tarot: '命运之轮', tarotZh: '命运之轮', tarotEn: 'Wheel of Fortune', tarotEmoji: '🎡',
-    tarotDesc: '命运的巨轮正在为你转动。变化即将到来，拥抱它，因为每一次转折都是通向更好自己的阶梯。',
-    tarotDescEn: 'The great wheel of fate is turning for you. Change is coming — embrace it, for every twist leads to a better version of yourself.',
-    fortuneStars: 4, wealth: 82, love: 75, career: 90, luck: 68,
-    fortuneDesc: '对你来说是充满变革与机遇的一年。上半年积累，下半年收获，记得保持初心！',
-    fortuneDescEn: 'A year full of transformation and opportunity. Build in the first half, harvest in the second — remember to stay true to yourself!'
-  },
-  {
-    mbti: 'INTJ', mbtiName: '建筑师', mbtiNameEn: 'Architect',
-    mbtiDesc: '深邃而独立的战略思想家，拥有将宏大愿景变为现实的非凡能力。你的大脑就像精密的棋盘，总是比别人多想三步。',
-    mbtiDescEn: 'A deep and independent strategic thinker with an extraordinary ability to turn grand visions into reality. Your mind works like a precise chessboard, always thinking three moves ahead.',
-    mbtiTags: ['🧩 系统思维', '🎯 目标坚定', '🌌 远见卓识'],
-    mbtiTagsEn: ['🧩 Systems Thinking', '🎯 Goal-Oriented', '🌌 Visionary'],
-    enneagram: 'Type 5 - 观察者', enneagramEn: 'Type 5 - The Investigator',
-    enneagramDesc: '你是知识的追求者，喜欢深入理解世界的运作方式。你珍惜独处时间，在思考中找到力量和安全感。',
-    enneagramDescEn: 'You are a seeker of knowledge who loves understanding how the world works. You cherish solitude and find strength and security in deep thought.',
-    enneagramTags: ['📚 求知若渴', '🔬 分析深刻', '🏔️ 独立自主'],
-    enneagramTagsEn: ['📚 Knowledge Seeker', '🔬 Deep Analyst', '🏔️ Independent'],
-    tarot: '隐者', tarotZh: '隐者', tarotEn: 'The Hermit', tarotEmoji: '🏔️',
-    tarotDesc: '内心的智慧正在觉醒。独处并非孤独，而是与自己灵魂对话的珍贵时刻。答案就在你心中。',
-    tarotDescEn: 'Inner wisdom is awakening. Solitude is not loneliness — it is a precious moment of dialogue with your own soul. The answer lies within.',
-    fortuneStars: 4, wealth: 78, love: 60, career: 95, luck: 72,
-    fortuneDesc: '这是你事业突破的关键年份。你的独特视角将被更多人认可，年末有重大转机！',
-    fortuneDescEn: 'This is the breakthrough year for your career. Your unique perspective will gain wider recognition, with a major turning point at year end!'
-  },
-  {
-    mbti: 'INFP', mbtiName: '调停者', mbtiNameEn: 'Mediator',
-    mbtiDesc: '诗意而富有同情心的理想主义者，总是在寻找人们心中隐藏的善意。你的内心是一座秘密花园，充满了不为人知的美丽。',
-    mbtiDescEn: 'A poetic and compassionate idealist, always seeking the hidden goodness in people. Your inner world is a secret garden full of unknown beauty.',
-    mbtiTags: ['🌸 温柔善感', '✨ 理想主义', '🎨 创意丰富'],
-    mbtiTagsEn: ['🌸 Gentle & Sensitive', '✨ Idealistic', '🎨 Creative'],
-    enneagram: 'Type 4 - 个人主义者', enneagramEn: 'Type 4 - The Individualist',
-    enneagramDesc: '你是独特灵魂的守护者，渴望真实地表达自己。你对美和意义有着超凡的感知力，内心世界丰富得像一部电影。',
-    enneagramDescEn: 'You are a guardian of unique souls, longing to express yourself authentically. You have an extraordinary sense for beauty and meaning — your inner world is as rich as a movie.',
-    enneagramTags: ['🦄 独一无二', '🎭 情感深邃', '🌊 浪漫诗意'],
-    enneagramTagsEn: ['🦄 One of a Kind', '🎭 Deep Emotions', '🌊 Romantic & Poetic'],
-    tarot: '星星', tarotZh: '星星', tarotEn: 'The Star', tarotEmoji: '⭐',
-    tarotDesc: '希望之星正照耀着你的前路。经历风雨之后，平静与治愈正在到来，保持信念，美好就在不远处。',
-    tarotDescEn: 'The star of hope shines upon your path. After the storms, calm and healing are arriving. Keep faith — beauty is not far away.',
-    fortuneStars: 5, wealth: 70, love: 92, career: 76, luck: 88,
-    fortuneDesc: '感情运势超旺！无论单身还是有伴，都将遇到心灵深处的共鸣。创作灵感也将源源不断。',
-    fortuneDescEn: 'Love fortune is blazing! Whether single or taken, deep soul connections await. Creative inspiration will flow endlessly.'
-  },
-  {
-    mbti: 'ESTP', mbtiName: '企业家', mbtiNameEn: 'Entrepreneur',
-    mbtiDesc: '精力充沛的行动派，喜欢活在当下并享受物质世界的刺激。你是派对上最耀眼的存在，总能把无聊变成冒险。',
-    mbtiDescEn: 'An energetic action-taker who loves living in the moment and enjoying the thrill of the physical world. You are the brightest presence at any party, turning boredom into adventure.',
-    mbtiTags: ['⚡ 精力充沛', '🎲 冒险精神', '🏄 活在当下'],
-    mbtiTagsEn: ['⚡ Energetic', '🎲 Adventurous', '🏄 Lives in the Moment'],
-    enneagram: 'Type 8 - 挑战者', enneagramEn: 'Type 8 - The Challenger',
-    enneagramDesc: '你是天生的领导者，充满力量和自信。不畏惧冲突，勇于直面挑战，用行动证明一切。',
-    enneagramDescEn: 'You are a born leader, full of power and confidence. Unafraid of conflict, you face challenges head-on and prove everything through action.',
-    enneagramTags: ['🦁 勇敢无畏', '💪 意志坚强', '👑 天生领袖'],
-    enneagramTagsEn: ['🦁 Fearless', '💪 Strong-Willed', '👑 Natural Leader'],
-    tarot: '战车', tarotZh: '战车', tarotEn: 'The Chariot', tarotEmoji: '⚔️',
-    tarotDesc: '胜利正在向你招手！保持你的冲劲和决心，没有什么障碍能阻挡你前进的脚步。掌控方向，全速前进！',
-    tarotDescEn: 'Victory beckons! Keep your drive and determination — no obstacle can stop your advance. Take the wheel and charge full speed ahead!',
-    fortuneStars: 4, wealth: 88, love: 72, career: 85, luck: 80,
-    fortuneDesc: '财运亨通，大胆投资会有意想不到的回报。下半年注意健康管理，劳逸结合才能走得更远。',
-    fortuneDescEn: 'Wealth fortune is booming — bold investments bring unexpected returns. Mind your health in the second half; balance work and rest to go further.'
-  },
-  {
-    mbti: 'ISFJ', mbtiName: '守卫者', mbtiNameEn: 'Defender',
-    mbtiDesc: '温暖而尽责的守护者，默默地关心着身边每一个人。你是最可靠的存在，你的温柔是这个世界最珍贵的力量。',
-    mbtiDescEn: 'A warm and devoted guardian who quietly cares for everyone around. You are the most reliable presence — your gentleness is the most precious power in this world.',
-    mbtiTags: ['🛡️ 可靠忠诚', '🌷 温暖体贴', '📋 细心周到'],
-    mbtiTagsEn: ['🛡️ Loyal & Reliable', '🌷 Warm & Caring', '📋 Attentive'],
-    enneagram: 'Type 2 - 助人者', enneagramEn: 'Type 2 - The Helper',
-    enneagramDesc: '你是天生的关爱者，总是先想到别人的需求。你的爱像阳光一样温暖，但也要记得把一些温暖留给自己。',
-    enneagramDescEn: 'You are a natural caregiver, always thinking of others first. Your love is as warm as sunshine — but remember to save some warmth for yourself.',
-    enneagramTags: ['💝 乐于助人', '🤗 共情能力强', '🏠 重视归属'],
-    enneagramTagsEn: ['💝 Helpful', '🤗 Empathetic', '🏠 Values Belonging'],
-    tarot: '女皇', tarotZh: '女皇', tarotEn: 'The Empress', tarotEmoji: '👸',
-    tarotDesc: '丰盛与滋养的能量围绕着你。你给予世界的爱将会以意想不到的方式回到你身边，好好爱自己。',
-    tarotDescEn: 'Energy of abundance and nurture surrounds you. The love you give to the world will return in unexpected ways — love yourself well.',
-    fortuneStars: 4, wealth: 75, love: 88, career: 72, luck: 85,
-    fortuneDesc: '人际关系迎来黄金期！你的真诚付出将获得丰厚回报，年中可能收到让你感动的惊喜。',
-    fortuneDescEn: 'Relationships enter a golden period! Your sincere efforts will be richly rewarded — a touching surprise may come mid-year.'
-  }
+// ===== MBTI DATA (16 types) =====
+const mbtiData = [
+  { code: 'ENFP', name: '竞选者', nameEn: 'Campaigner', desc: '你是一颗永远闪烁的星星，用无尽的热情点亮每一个角落。你的灵魂里住着一千个奇妙的念头，每一个都在等着被你温柔地唤醒。世界因为有你，变得更加缤纷而有趣。', descEn: 'You are a star that never stops shining, lighting up every corner with boundless enthusiasm. A thousand wonderful ideas live inside your soul, each waiting to be gently awakened by you. The world becomes more colorful and fun because of you.', tags: ['🌈 热情洋溢', '💡 灵感不断', '🦋 自由灵魂'], tagsEn: ['🌈 Enthusiastic', '💡 Inspired', '🦋 Free Spirit'] },
+  { code: 'ENFJ', name: '主角', nameEn: 'Protagonist', desc: '你天生就拥有照亮他人的光芒，像一轮温暖的太阳守护着身边的每一个人。你能读懂别人心底的声音，用爱与智慧引领大家走向更好的远方。', descEn: 'You were born with a radiance that lights up others, like a warm sun watching over everyone around you. You can hear the voices hidden in people\'s hearts and guide them toward a brighter horizon with love and wisdom.', tags: ['☀️ 天生领袖', '🤝 温暖守护', '🌟 感召人心'], tagsEn: ['☀️ Natural Leader', '🤝 Warm Guardian', '🌟 Inspiring'] },
+  { code: 'ENTP', name: '辩论家', nameEn: 'Debater', desc: '你的脑海里永远在上演一场精彩的思维烟火秀，每一个火花都可能改变世界的模样。你热爱探索一切未知的边界，用机智和幽默拆解生活的每一道谜题。', descEn: 'There is always a dazzling fireworks show of ideas going off in your mind, and every spark has the potential to reshape the world. You love exploring every unknown frontier, dismantling life\'s puzzles with wit and humor.', tags: ['🎆 奇思妙想', '🗣️ 能言善辩', '🔓 打破常规'], tagsEn: ['🎆 Inventive', '🗣️ Quick-Witted', '🔓 Rule Breaker'] },
+  { code: 'ENTJ', name: '指挥官', nameEn: 'Commander', desc: '你拥有一颗运筹帷幄的心，像一位从星辰中走来的将军，天生为征服挑战而生。你的目光坚定而深远，总能在混沌中找到最清晰的道路。', descEn: 'You possess a strategic heart, like a general who stepped out of the stars, born to conquer challenges. Your gaze is steady and far-reaching, always finding the clearest path through chaos.', tags: ['👑 霸气决断', '🎯 目标明确', '🏔️ 征服巅峰'], tagsEn: ['👑 Decisive', '🎯 Goal-Driven', '🏔️ Peak Conqueror'] },
+  { code: 'ESFP', name: '表演者', nameEn: 'Entertainer', desc: '你就是人群中最耀眼的那道光，走到哪里都能带来欢笑与快乐。你的灵魂在音乐与色彩中起舞，每一刻都活成最热烈的模样。', descEn: 'You are the most dazzling light in any crowd, bringing laughter and joy wherever you go. Your soul dances among music and colors, living every moment to its most vibrant fullest.', tags: ['🎉 快乐源泉', '💃 活力四射', '🎨 多才多艺'], tagsEn: ['🎉 Joy Bringer', '💃 Energetic', '🎨 Versatile'] },
+  { code: 'ESFJ', name: '执政官', nameEn: 'Consul', desc: '你是人间最温柔的港湾，用无微不至的关怀编织着每一份温暖。你记得每个人的喜好，把爱藏在一杯热茶和一句问候里。有你的地方，就有家的感觉。', descEn: 'You are the gentlest harbor in the world, weaving warmth through meticulous care. You remember everyone\'s preferences, hiding love in a cup of warm tea and a kind greeting. Wherever you are, it feels like home.', tags: ['🏠 温馨守护', '💝 贴心关怀', '🫂 人际达人'], tagsEn: ['🏠 Warm Keeper', '💝 Caring Soul', '🫂 Social Expert'] },
+  { code: 'ESTP', name: '企业家', nameEn: 'Entrepreneur', desc: '你像一阵自由的风，永远追逐着下一个刺激的冒险。你有着敏锐的直觉和果断的行动力，总能在关键时刻化险为夷。活在当下，是你写给生命最酷的情书。', descEn: 'You are like a free wind, always chasing the next thrilling adventure. With sharp instincts and decisive action, you always turn danger into triumph at the crucial moment.', tags: ['🏄 冒险达人', '⚡ 行动派', '🎲 活在当下'], tagsEn: ['🏄 Adventurer', '⚡ Action Taker', '🎲 Lives in the Moment'] },
+  { code: 'ESTJ', name: '总经理', nameEn: 'Executive', desc: '你是秩序世界里最可靠的基石，用条理与担当撑起身边人的安全感。你说到做到，每一个承诺都像刻在石头上一样坚定。', descEn: 'You are the most dependable cornerstone in the world of order, giving those around you a sense of security through structure and responsibility. You always keep your word — every promise is as solid as if carved in stone.', tags: ['📋 秩序之王', '🤝 信守承诺', '🏛️ 可靠担当'], tagsEn: ['📋 Order Keeper', '🤝 Promise Keeper', '🏛️ Dependable'] },
+  { code: 'INFP', name: '调停者', nameEn: 'Mediator', desc: '你的内心是一座藏满星光的花园，每一朵花都带着独一无二的梦。你用诗意的眼睛看世界，能发现别人看不见的温柔与美好。你虽然安静，却拥有改变世界的温柔力量。', descEn: 'Your inner world is a garden filled with starlight, where every flower carries a one-of-a-kind dream. You see the world through poetic eyes, discovering tenderness and beauty invisible to others.', tags: ['🌙 梦幻诗人', '🌸 温柔理想', '✨ 内心丰盈'], tagsEn: ['🌙 Dreamy Poet', '🌸 Gentle Idealist', '✨ Rich Inner World'] },
+  { code: 'INFJ', name: '提倡者', nameEn: 'Advocate', desc: '你是这个世界上最稀有的灵魂之一，像一盏在迷雾中静静燃烧的灯塔。你拥有洞穿人心的直觉和改变世界的理想，在安静中酝酿着深沉而伟大的力量。', descEn: 'You are one of the rarest souls in this world, like a lighthouse burning quietly through the mist. You possess an intuition that sees through hearts and ideals that can change the world.', tags: ['🔮 灵魂洞察', '🕯️ 静谧力量', '🦄 稀有灵魂'], tagsEn: ['🔮 Soul Reader', '🕯️ Quiet Power', '🦄 Rare Soul'] },
+  { code: 'INTP', name: '逻辑学家', nameEn: 'Logician', desc: '你的大脑是一座永不停歇的思想宇宙，每一颗星球都是一个等待被解开的谜。你在别人看到混乱的地方发现规律，用纯粹的逻辑编织出最优雅的真理。', descEn: 'Your brain is a tireless universe of thought, where every planet is a mystery waiting to be unraveled. Where others see chaos, you discover patterns, weaving the most elegant truths with pure logic.', tags: ['🧠 思维宇宙', '🔬 真理探索', '🧩 逻辑之美'], tagsEn: ['🧠 Thought Universe', '🔬 Truth Seeker', '🧩 Logic Beauty'] },
+  { code: 'INTJ', name: '建筑师', nameEn: 'Architect', desc: '你是那个在脑海中构建未来蓝图的人，像一位来自未来的谋略家。你的思维精密而深邃，每一步棋都经过缜密的推演。你不追随潮流，因为你本身就在创造潮流。', descEn: 'You are the one who builds blueprints of the future in your mind, like a strategist from times yet to come. Your thinking is precise and profound, with every move carefully calculated.', tags: ['🏗️ 未来蓝图', '♟️ 深谋远虑', '🌌 独立远见'], tagsEn: ['🏗️ Future Architect', '♟️ Strategic Mind', '🌌 Independent Visionary'] },
+  { code: 'ISFP', name: '探险家', nameEn: 'Adventurer', desc: '你是一个用色彩和感受丈量世界的旅人，内心住着一片只属于你的秘密花园。你用双手创造美，用心灵感受风，每一刻都活成一幅温柔的画。', descEn: 'You are a traveler who measures the world through color and feeling, with a secret garden living inside your heart. You create beauty with your hands and feel the wind with your soul.', tags: ['🎨 艺术灵魂', '🌿 自然旅人', '🦢 温柔之美'], tagsEn: ['🎨 Artistic Soul', '🌿 Nature Wanderer', '🦢 Gentle Beauty'] },
+  { code: 'ISFJ', name: '守卫者', nameEn: 'Defender', desc: '你是这个喧嚣世界里最安静的守护天使，用默默的付出温暖着每一个你爱的人。你的记忆里珍藏着所有美好的细节，像一本写满爱的日记。', descEn: 'You are the quietest guardian angel in this noisy world, warming everyone you love through silent devotion. Your memory treasures every beautiful detail, like a diary filled with love.', tags: ['🛡️ 默默守护', '📖 珍藏记忆', '🌷 无声温柔'], tagsEn: ['🛡️ Silent Guardian', '📖 Memory Keeper', '🌷 Quiet Tenderness'] },
+  { code: 'ISTP', name: '鉴赏家', nameEn: 'Virtuoso', desc: '你是一个酷酷的灵魂工匠，用一双巧手解开世界运转的秘密。你不爱多说，却能在关键时刻展现出惊人的能力。你像一把藏在鞘中的利剑，平时沉默，出手即是传奇。', descEn: 'You are a cool soul craftsman, unlocking the secrets of how the world works with skillful hands. You don\'t say much, but reveal astonishing ability at the critical moment.', tags: ['🔧 灵巧工匠', '🗡️ 沉默利剑', '🏍️ 酷感十足'], tagsEn: ['🔧 Skillful Maker', '🗡️ Silent Blade', '🏍️ Effortlessly Cool'] },
+  { code: 'ISTJ', name: '物流师', nameEn: 'Logistician', desc: '你是人群中最值得信赖的磐石，用坚定和耐心守护着每一份责任。你的世界井然有序，每一个细节都经过你认真的打理。你不追求浮华，却用行动证明了什么是最长久的可靠。', descEn: 'You are the most trustworthy rock among the crowd, guarding every responsibility with steadfastness and patience. Your world is perfectly ordered, with every detail carefully tended by you.', tags: ['🪨 坚定磐石', '📐 条理分明', '⏳ 持之以恒'], tagsEn: ['🪨 Steady Rock', '📐 Well-Organized', '⏳ Perseverant'] }
 ];
+
+// ===== ENNEAGRAM DATA (9 types) =====
+const enneagramData = [
+  { type: 'Type 1 - 完美主义者', typeEn: 'Type 1 - The Reformer', desc: '你的灵魂深处住着一位优雅的守护者，时刻追寻着世间最纯粹的秩序与美好。你用心雕琢生活的每一个细节，像一颗闪闪发光的星星，照亮身边每个人前行的方向。', descEn: 'Deep within your soul lives an elegant guardian, forever seeking the purest order and beauty in the world. You lovingly polish every detail of life, shining like a bright little star that lights the way for everyone around you.', tags: ['✨ 秩序之光', '🌿 理想主义', '💎 精益求精'], tagsEn: ['✨ Light of Order', '🌿 Idealist', '💎 Perfectionist'] },
+  { type: 'Type 2 - 助人者', typeEn: 'Type 2 - The Helper', desc: '你是这个世界上最温暖的小太阳，天生就拥有感知他人需求的神奇天赋。你的爱像春天的微风一样，轻轻拂过每个人的心田，让枯萎的花朵也能重新绽放。', descEn: 'You are the warmest little sun in this world, born with a magical gift for sensing what others need. Your love is like a spring breeze, gently touching every heart and making even wilted flowers bloom again.', tags: ['🌞 温暖小太阳', '💕 心灵感应', '🤗 天生守护者'], tagsEn: ['🌞 Warm Sun', '💕 Heart Reader', '🤗 Born Protector'] },
+  { type: 'Type 3 - 成就者', typeEn: 'Type 3 - The Achiever', desc: '你是人群中最耀眼的追光者，浑身散发着让人无法忽视的光芒与魅力。你拥有把梦想变成现实的神奇魔法，每一步都走得坚定而闪亮。', descEn: 'You are the most dazzling dream-chaser in the crowd, radiating an irresistible glow and charm. You possess the magical ability to turn dreams into reality, every step firm and sparkling.', tags: ['🌟 追光者', '🏆 梦想魔法师', '🚀 闪耀前行'], tagsEn: ['🌟 Dream Chaser', '🏆 Goal Wizard', '🚀 Shine Forward'] },
+  { type: 'Type 4 - 个人主义者', typeEn: 'Type 4 - The Individualist', desc: '你的灵魂像一片神秘而深邃的星空，藏着别人永远读不完的诗篇。你对美与情感有着最细腻的感知力，能在平凡中发现那些被忽略的小小奇迹。', descEn: 'Your soul is like a mysterious and profound starry sky, holding endless poems that others could never finish reading. You perceive beauty and emotion with the most delicate sensitivity, discovering little miracles hidden in the ordinary.', tags: ['🌙 灵魂诗人', '🎨 独特之美', '🦋 深邃星空'], tagsEn: ['🌙 Soul Poet', '🎨 Unique Beauty', '🦋 Deep Starlight'] },
+  { type: 'Type 5 - 观察者', typeEn: 'Type 5 - The Investigator', desc: '你是一位安静而智慧的星际探索者，用那双清澈的眼睛洞察着世间万物的奥秘。你的内心像一座藏满宝藏的图书馆，每一个想法都闪烁着迷人的光芒。', descEn: 'You are a quiet and wise cosmic explorer, using those crystal-clear eyes to unravel the mysteries of all things. Your mind is like a library filled with treasures, every thought glimmering with a fascinating glow.', tags: ['🔭 星际探索者', '📚 智慧宝库', '🧠 万物洞察'], tagsEn: ['🔭 Cosmic Explorer', '📚 Wisdom Vault', '🧠 Deep Observer'] },
+  { type: 'Type 6 - 忠诚者', typeEn: 'Type 6 - The Loyalist', desc: '你是人世间最可靠的小灯塔，用坚定的信念守护着每一段珍贵的情谊。你虽然偶尔会担心风浪，但内心深处藏着比任何人都勇敢的力量。', descEn: 'You are the most dependable little lighthouse in this world, guarding every precious bond with steadfast belief. Though you may sometimes worry about storms, deep inside you hold a courage braver than anyone.', tags: ['🏠 安心灯塔', '🛡️ 忠诚守护', '🤝 信念之心'], tagsEn: ['🏠 Safe Lighthouse', '🛡️ Loyal Guardian', '🤝 Heart of Faith'] },
+  { type: 'Type 7 - 享乐主义者', typeEn: 'Type 7 - The Enthusiast', desc: '你是一只快乐的小蝴蝶，在生活的花园里自由自在地翩翩起舞。你拥有把一切变得有趣的魔力，走到哪里都能带来欢声笑语和无限惊喜。', descEn: 'You are a joyful little butterfly, dancing freely through the garden of life. You possess the magic to make everything fun, bringing laughter and endless surprises wherever you go.', tags: ['🦋 快乐蝴蝶', '🎉 惊喜制造机', '🌈 缤纷魔法'], tagsEn: ['🦋 Joyful Butterfly', '🎉 Surprise Maker', '🌈 Rainbow Magic'] },
+  { type: 'Type 8 - 挑战者', typeEn: 'Type 8 - The Challenger', desc: '你是一位无畏的小勇士，心中燃烧着守护正义与真理的熊熊火焰。你用强大的力量为在意的人撑起一片天，那份霸气中藏着最柔软的深情。', descEn: 'You are a fearless little warrior, with a blazing flame of justice and truth burning in your heart. You use your mighty strength to hold up the sky for those you care about, hiding the softest tenderness beneath that bold exterior.', tags: ['🔥 无畏勇士', '👑 正义守护', '💪 铁汉柔情'], tagsEn: ['🔥 Fearless Warrior', '👑 Justice Keeper', '💪 Gentle Strength'] },
+  { type: 'Type 9 - 和平者', typeEn: 'Type 9 - The Peacemaker', desc: '你是这个世界上最温柔的一朵云，静静地包容着万物，化解着每一丝纷争与不安。你的内心像一片宁静的湖水，倒映着最美好的风景，让靠近你的人都感到无比平静。', descEn: 'You are the gentlest cloud in this world, quietly embracing all things and dissolving every trace of conflict and unease. Your heart is like a tranquil lake, reflecting the most beautiful scenery, bringing profound peace to everyone who draws near.', tags: ['☁️ 温柔之云', '🕊️ 和平使者', '🌊 宁静湖水'], tagsEn: ['☁️ Gentle Cloud', '🕊️ Peace Bringer', '🌊 Tranquil Lake'] }
+];
+
+// ===== TAROT DATA (78 cards) =====
+const tarotData = [
+  { name: '愚者', nameEn: 'The Fool', emoji: '🃏', desc: '踏上未知的旅途，心怀纯真与无限可能。勇敢迈出第一步，宇宙会为你铺路。', descEn: 'Step into the unknown with innocence and infinite possibility. Take that leap of faith — the universe will catch you.' },
+  { name: '魔术师', nameEn: 'The Magician', emoji: '✨', desc: '你拥有将梦想化为现实的力量，万物皆在你的掌握之中。专注意念，奇迹自会显现。', descEn: 'You hold the power to turn dreams into reality. Focus your will and watch miracles unfold before you.' },
+  { name: '女祭司', nameEn: 'The High Priestess', emoji: '🌙', desc: '静静聆听内心深处的声音，直觉是你最忠实的向导。神秘的面纱之后，隐藏着你早已知晓的答案。', descEn: 'Listen to the whisper within — your intuition is your truest guide. Behind the veil of mystery lies an answer you already know.' },
+  { name: '女皇', nameEn: 'The Empress', emoji: '🌿', desc: '丰饶与爱意如春风般围绕着你，创造力正蓬勃生长。拥抱生命的馈赠，让美好自然绽放。', descEn: 'Abundance and love surround you like a warm spring breeze. Embrace life\'s gifts and let beauty blossom naturally.' },
+  { name: '皇帝', nameEn: 'The Emperor', emoji: '👑', desc: '稳固的力量与秩序是你前行的基石。以智慧与坚定，建造属于你的王国。', descEn: 'Solid strength and order are your foundation. With wisdom and resolve, build the kingdom that is rightfully yours.' },
+  { name: '教皇', nameEn: 'The Hierophant', emoji: '🔑', desc: '古老的智慧正在向你敞开大门，在传承中寻找指引。信任那些经过时间考验的真理。', descEn: 'Ancient wisdom opens its doors to you — seek guidance in tradition. Trust the truths that have withstood the test of time.' },
+  { name: '恋人', nameEn: 'The Lovers', emoji: '💕', desc: '真挚的连接正在呼唤你，倾听心灵的选择。爱是最强大的力量，它将照亮你的道路。', descEn: 'A heartfelt connection calls to you — listen to the choice your soul makes. Love is the mightiest force, and it will light your path.' },
+  { name: '战车', nameEn: 'The Chariot', emoji: '🏇', desc: '以坚定的意志驾驭前方的挑战，胜利就在不远处。掌控方向，勇往直前。', descEn: 'Command your challenges with unwavering willpower — victory awaits just ahead. Take the reins and charge forward.' },
+  { name: '力量', nameEn: 'Strength', emoji: '🦁', desc: '真正的力量源自内心的温柔与勇气。以爱驯服恐惧，你比想象中更加强大。', descEn: 'True strength flows from inner gentleness and courage. Tame fear with love — you are far stronger than you know.' },
+  { name: '隐者', nameEn: 'The Hermit', emoji: '🏮', desc: '在宁静的独处中点亮内心的明灯，智慧在沉思中显现。退一步，方能看清前路。', descEn: 'In quiet solitude, light the lantern within — wisdom reveals itself in reflection. Step back to see the way forward.' },
+  { name: '命运之轮', nameEn: 'Wheel of Fortune', emoji: '🎡', desc: '命运的巨轮正在转动，崭新的机遇即将来临。顺应变化的节奏，好运正悄然降临。', descEn: 'The great wheel turns and fresh opportunities arise. Flow with the rhythm of change — fortune is quietly finding you.' },
+  { name: '正义', nameEn: 'Justice', emoji: '⚖️', desc: '因果终将平衡，真相会在合适的时刻揭晓。保持正直，公正的回报定会到来。', descEn: 'All things find their balance in time, and truth reveals itself when ready. Stay honest — just rewards will come.' },
+  { name: '倒吊人', nameEn: 'The Hanged Man', emoji: '🔮', desc: '换一个角度看世界，悬停之中蕴含深刻的领悟。放下执念，新的视野将为你打开。', descEn: 'See the world from a different angle — stillness holds profound insight. Let go of attachment and a new perspective will open for you.' },
+  { name: '死神', nameEn: 'Death', emoji: '🦋', desc: '旧的篇章正在落幕，蜕变带来重生的力量。不必恐惧结束，因为黎明就在转角。', descEn: 'An old chapter closes as transformation brings the power of rebirth. Do not fear endings — dawn waits just around the corner.' },
+  { name: '节制', nameEn: 'Temperance', emoji: '🌈', desc: '在平衡与和谐中找到内心的宁静，耐心是你的盟友。温柔地调和一切，奇妙的融合正在发生。', descEn: 'Find peace in balance and harmony — patience is your ally. Blend all things gently, for a wondrous alchemy is taking place.' },
+  { name: '恶魔', nameEn: 'The Devil', emoji: '⛓️', desc: '审视束缚你的锁链，它们或许只是幻象。觉醒的力量就在你手中，勇敢挣脱枷锁。', descEn: 'Examine the chains that bind you — they may be mere illusion. The power to awaken is in your hands; break free with courage.' },
+  { name: '塔', nameEn: 'The Tower', emoji: '🏰', desc: '旧有的结构正在崩塌，为新的开始腾出空间。风暴过后，你将在更坚实的地基上重建。', descEn: 'Old structures crumble to make way for a fresh start. After the storm, you will rebuild on far stronger ground.' },
+  { name: '星星', nameEn: 'The Star', emoji: '⭐', desc: '希望的星光照耀着你，疗愈与祝福正温柔降临。相信未来，宇宙正为你编织美好。', descEn: 'Starlight of hope shines upon you as healing and blessings gently descend. Trust the future — the cosmos is weaving beauty for you.' },
+  { name: '月亮', nameEn: 'The Moon', emoji: '🌙', desc: '月光下的迷雾终将散去，直觉会为你指引方向。穿越幻象，真相将温柔地显现。', descEn: 'The mist beneath the moonlight will lift, and intuition will guide your way. Walk through illusion — truth will gently reveal itself.' },
+  { name: '太阳', nameEn: 'The Sun', emoji: '☀️', desc: '灿烂的阳光洒满前路，喜悦与成功正在拥抱你。尽情欢笑吧，光明已经到来。', descEn: 'Brilliant sunlight floods your path — joy and success embrace you now. Laugh freely, for the light has arrived.' },
+  { name: '审判', nameEn: 'Judgement', emoji: '📯', desc: '灵魂的号角已经吹响，觉醒与重生的时刻到来。回应内心的召唤，迈向更高的自我。', descEn: 'The trumpet of the soul has sounded — a moment of awakening and rebirth. Answer the inner calling and step into your higher self.' },
+  { name: '世界', nameEn: 'The World', emoji: '🌍', desc: '圆满的旅程抵达终点，你已完成了生命的一次伟大循环。庆祝吧，新的宏伟篇章即将开启。', descEn: 'A journey reaches its glorious completion — you have fulfilled a great cycle of life. Celebrate, for a grand new chapter is about to begin.' },
+  { name: '权杖王牌', nameEn: 'Ace of Wands', emoji: '🔥', desc: '一股全新的热情与灵感正在涌现，创造的火种已经点燃。抓住这份力量，大胆开始吧。', descEn: 'A fresh surge of passion and inspiration ignites within you. Seize this spark and boldly begin your creation.' },
+  { name: '权杖二', nameEn: 'Two of Wands', emoji: '🔥', desc: '站在世界的门前，远大的计划正等待你去探索。眼光放远，未来握在你手中。', descEn: 'You stand at the gateway of the world — grand plans await your exploration. Look far ahead; the future rests in your hands.' },
+  { name: '权杖三', nameEn: 'Three of Wands', emoji: '🔥', desc: '你播下的种子开始结出果实，远方传来好消息。保持信心，扩展即将来临。', descEn: 'Seeds you planted are bearing fruit, and good news arrives from afar. Keep faith — expansion is on its way.' },
+  { name: '权杖四', nameEn: 'Four of Wands', emoji: '🔥', desc: '庆祝丰收的时刻已到，稳定与欢乐环绕着你。与珍爱的人共享这份温暖的成就。', descEn: 'A time of celebration has come — stability and joy surround you. Share this warm achievement with those you cherish.' },
+  { name: '权杖五', nameEn: 'Five of Wands', emoji: '🔥', desc: '竞争与碰撞激发出成长的火花，挑战中蕴含机遇。以开放的心态迎接不同的声音。', descEn: 'Competition and friction spark growth — challenges hold hidden opportunity. Welcome differing voices with an open heart.' },
+  { name: '权杖六', nameEn: 'Six of Wands', emoji: '🔥', desc: '胜利的号角为你吹响，你的努力终获认可。昂首阔步，荣耀属于你。', descEn: 'The trumpet of victory sounds for you — your efforts are finally recognized. Walk tall, for glory is yours.' },
+  { name: '权杖七', nameEn: 'Seven of Wands', emoji: '🔥', desc: '坚守你的立场，你有足够的力量捍卫信念。勇敢面对挑战，坚持终将赢得尊重。', descEn: 'Hold your ground — you have the strength to defend what you believe. Face challenges bravely; perseverance earns respect.' },
+  { name: '权杖八', nameEn: 'Eight of Wands', emoji: '🔥', desc: '事情正以飞快的速度推进，行动的时刻已经到来。顺势而为，让能量自由流动。', descEn: 'Events accelerate swiftly — the moment for action has arrived. Ride the momentum and let energy flow freely.' },
+  { name: '权杖九', nameEn: 'Nine of Wands', emoji: '🔥', desc: '虽然疲惫，但你已经走过了最艰难的路。再坚持一下，终点的光芒就在前方。', descEn: 'You are weary, yet you have crossed the hardest terrain. Hold on a little longer — the glow of the finish line is near.' },
+  { name: '权杖十', nameEn: 'Ten of Wands', emoji: '🔥', desc: '肩上的重担提醒你学会分担与取舍。放下不必要的负重，轻装方能远行。', descEn: 'The weight on your shoulders reminds you to share burdens and prioritize. Release what is unnecessary — travel light to go far.' },
+  { name: '权杖侍从', nameEn: 'Page of Wands', emoji: '🔥', desc: '一颗热切探索的心正在苏醒，充满好奇与冒险精神。追随你的热情，新的冒险在召唤。', descEn: 'An eager heart of exploration awakens, full of curiosity and adventure. Follow your passion — a new quest is calling.' },
+  { name: '权杖骑士', nameEn: 'Knight of Wands', emoji: '🔥', desc: '带着勇气与激情奔赴前方，大胆行动不犹豫。你的热忱将点燃一路的风景。', descEn: 'Charge ahead with courage and passion — act boldly without hesitation. Your fervor will set the journey ablaze with wonder.' },
+  { name: '权杖王后', nameEn: 'Queen of Wands', emoji: '🔥', desc: '自信与魅力是你天生的武器，温暖的光芒感染周围的人。绽放你的光彩，世界因你而精彩。', descEn: 'Confidence and charisma are your natural gifts, warming everyone around you. Shine your light — the world is brighter because of you.' },
+  { name: '权杖国王', nameEn: 'King of Wands', emoji: '🔥', desc: '以远见与领导力驾驭你的王国，热情是你不灭的火焰。引领他人，成就非凡的事业。', descEn: 'Rule your realm with vision and leadership — passion is your eternal flame. Inspire others and forge an extraordinary legacy.' },
+  { name: '圣杯王牌', nameEn: 'Ace of Cups', emoji: '❤️', desc: '爱与情感的源泉正在涌出，心灵被深深滋养。敞开心扉，接受这份纯粹的祝福。', descEn: 'A wellspring of love and emotion flows forth, nourishing your soul. Open your heart and receive this pure blessing.' },
+  { name: '圣杯二', nameEn: 'Two of Cups', emoji: '❤️', desc: '两颗心灵正在深情相连，和谐的情感纽带由此诞生。珍惜这份互相映照的温暖。', descEn: 'Two souls connect in deep affection — a harmonious emotional bond is born. Cherish this warmth of mutual reflection.' },
+  { name: '圣杯三', nameEn: 'Three of Cups', emoji: '❤️', desc: '友情与欢聚带来心灵的满足，分享喜悦让幸福加倍。与挚友举杯，庆祝生命中的美好。', descEn: 'Friendship and celebration fill the heart — shared joy doubles happiness. Raise a cup with dear friends to life\'s beauty.' },
+  { name: '圣杯四', nameEn: 'Four of Cups', emoji: '❤️', desc: '暂时的倦怠中隐藏着被忽略的机遇。抬起头来，生命递给你的新礼物就在眼前。', descEn: 'Within momentary apathy lies an overlooked opportunity. Look up — a new gift from life is right before you.' },
+  { name: '圣杯五', nameEn: 'Five of Cups', emoji: '❤️', desc: '悲伤笼罩了你的视线，但身后仍有未倒的杯盏。转过身来，希望从未远离。', descEn: 'Grief clouds your sight, yet cups still stand behind you. Turn around — hope has never left your side.' },
+  { name: '圣杯六', nameEn: 'Six of Cups', emoji: '❤️', desc: '温馨的回忆如涓涓细流温暖着你的心，纯真的快乐重回身边。让童心指引你找回简单的幸福。', descEn: 'Tender memories warm your heart like a gentle stream, and innocent joy returns. Let your inner child guide you back to simple happiness.' },
+  { name: '圣杯七', nameEn: 'Seven of Cups', emoji: '❤️', desc: '梦幻的选择摆在面前，每一个都闪耀着迷人的光。擦亮双眼，辨别幻象中的真实之光。', descEn: 'Enchanting choices shimmer before you, each one alluring. Clear your vision and discern the true light among the illusions.' },
+  { name: '圣杯八', nameEn: 'Eight of Cups', emoji: '❤️', desc: '是时候放下已不再满足你的事物，踏上寻找更深意义的旅程。勇敢转身，更好的在前方等你。', descEn: 'It is time to leave behind what no longer fulfills you and seek deeper meaning. Turn bravely — something better awaits ahead.' },
+  { name: '圣杯九', nameEn: 'Nine of Cups', emoji: '❤️', desc: '心愿达成的喜悦充盈胸间，满足与感恩自然流淌。享受这份丰盛，你值得这一切。', descEn: 'The joy of a wish fulfilled fills your heart — contentment and gratitude flow freely. Savor this abundance; you deserve it all.' },
+  { name: '圣杯十', nameEn: 'Ten of Cups', emoji: '❤️', desc: '情感的圆满与家庭的和睦如彩虹般绚烂。爱已筑成港湾，幸福近在咫尺。', descEn: 'Emotional fulfillment and family harmony shine like a radiant rainbow. Love has built a haven — happiness is within reach.' },
+  { name: '圣杯侍从', nameEn: 'Page of Cups', emoji: '❤️', desc: '一份温柔的惊喜正悄然靠近，直觉与创意在心中萌芽。怀着孩子般的好奇心去感受世界。', descEn: 'A gentle surprise quietly approaches as intuition and creativity bud within. Feel the world with childlike wonder.' },
+  { name: '圣杯骑士', nameEn: 'Knight of Cups', emoji: '❤️', desc: '浪漫与理想的使者翩然而至，带着真挚的情感。追随心灵的召唤，让爱引导你前行。', descEn: 'A messenger of romance and ideals arrives bearing heartfelt emotion. Follow the call of your heart and let love lead the way.' },
+  { name: '圣杯王后', nameEn: 'Queen of Cups', emoji: '❤️', desc: '温柔的力量与深邃的共情是你最珍贵的礼物。用爱包容一切，你的直觉无比精准。', descEn: 'Gentle strength and deep empathy are your most precious gifts. Embrace all with love — your intuition is remarkably keen.' },
+  { name: '圣杯国王', nameEn: 'King of Cups', emoji: '❤️', desc: '以平静与智慧驾驭情感的海洋，内心既柔软又坚定。你是情感与理性的完美平衡者。', descEn: 'Navigate the ocean of emotions with calm and wisdom — your heart is both tender and strong. You are the perfect balance of feeling and reason.' },
+  { name: '宝剑王牌', nameEn: 'Ace of Swords', emoji: '⚔️', desc: '清晰的思维如利剑破开迷雾，真理的光芒闪耀。用新的洞见切开困局，突破就在此刻。', descEn: 'Clear thought cuts through the fog like a shining blade — truth gleams. Slice through confusion with fresh insight; breakthrough is now.' },
+  { name: '宝剑二', nameEn: 'Two of Swords', emoji: '⚔️', desc: '内心的天平在两难中摇摆，暂时的僵局需要勇气打破。卸下蒙眼布，直面真相吧。', descEn: 'Your inner scales sway in dilemma — a temporary stalemate needs courage to break. Remove the blindfold and face the truth.' },
+  { name: '宝剑三', nameEn: 'Three of Swords', emoji: '⚔️', desc: '心碎的痛楚虽深，但它是通向疗愈的必经之路。允许自己悲伤，雨过必有天晴。', descEn: 'Heartache cuts deep, yet it is the necessary path to healing. Allow yourself to grieve — clear skies always follow the rain.' },
+  { name: '宝剑四', nameEn: 'Four of Swords', emoji: '⚔️', desc: '疲惫的战士需要休憩，在宁静中恢复力量。让身心安歇，觉醒后你将更加强大。', descEn: 'The weary warrior needs rest — regain strength in stillness. Let body and mind repose; you will rise again stronger.' },
+  { name: '宝剑五', nameEn: 'Five of Swords', emoji: '⚔️', desc: '冲突过后，反思胜负的真正意义。有时退让并非软弱，而是更高的智慧。', descEn: 'After conflict, reflect on what winning truly means. Sometimes yielding is not weakness but a higher wisdom.' },
+  { name: '宝剑六', nameEn: 'Six of Swords', emoji: '⚔️', desc: '离开风暴的海域，驶向平静的彼岸。过渡虽然艰辛，但更好的日子正在前方等待。', descEn: 'Leave stormy waters behind and sail toward calmer shores. The passage may be hard, but better days await ahead.' },
+  { name: '宝剑七', nameEn: 'Seven of Swords', emoji: '⚔️', desc: '运用智慧与策略来应对困境，灵巧胜过蛮力。保持警觉，以机敏化解潜在的风险。', descEn: 'Use wit and strategy to navigate difficulty — cleverness outshines brute force. Stay alert and defuse hidden risks with agility.' },
+  { name: '宝剑八', nameEn: 'Eight of Swords', emoji: '⚔️', desc: '束缚你的围墙大多是心造的幻象。睁开双眼，你会发现出路一直都在。', descEn: 'The walls that confine you are mostly illusions of the mind. Open your eyes — the way out has always been there.' },
+  { name: '宝剑九', nameEn: 'Nine of Swords', emoji: '⚔️', desc: '深夜的忧虑与恐惧往往被放大了许多倍。天亮之后，你会发现事情并没有那么糟。', descEn: 'Worries and fears in the dead of night are often magnified many times over. Come daylight, things are never as dire as they seem.' },
+  { name: '宝剑十', nameEn: 'Ten of Swords', emoji: '⚔️', desc: '最深的谷底意味着唯一的方向是向上。黑暗已至尽头，黎明的第一缕光即将破晓。', descEn: 'The deepest valley means the only direction is up. Darkness has reached its end — the first light of dawn is about to break.' },
+  { name: '宝剑侍从', nameEn: 'Page of Swords', emoji: '⚔️', desc: '敏锐的头脑与旺盛的求知欲是你的武器。保持好奇，用智慧探索真相的每一个角落。', descEn: 'A sharp mind and eager curiosity are your weapons. Stay inquisitive and explore every corner of truth with intellect.' },
+  { name: '宝剑骑士', nameEn: 'Knight of Swords', emoji: '⚔️', desc: '以果断的行动力冲破阻碍，思维如疾风般敏捷。勇敢追寻真理，但别忘了三思而后行。', descEn: 'Break through obstacles with decisive action and wind-swift thought. Pursue truth boldly, but remember to think before you leap.' },
+  { name: '宝剑王后', nameEn: 'Queen of Swords', emoji: '⚔️', desc: '以清明的心智洞察一切，真实与公正是你的信条。你的智慧锋利而温暖，能看透表象直达本质。', descEn: 'Perceive all with a lucid mind — honesty and fairness are your creed. Your wisdom is sharp yet warm, seeing through surfaces to the essence.' },
+  { name: '宝剑国王', nameEn: 'King of Swords', emoji: '⚔️', desc: '以理性与权威做出公正的裁决，你的判断力无可动摇。用清醒的头脑引领方向，真理因你而彰显。', descEn: 'Render fair judgment with reason and authority — your discernment is unshakable. Lead with a clear mind, and truth will be revealed through you.' },
+  { name: '星币王牌', nameEn: 'Ace of Pentacles', emoji: '🪙', desc: '一颗丰饶的种子落入你的手心，物质与精神的富足正在萌芽。把握这份新机遇，稳步前行。', descEn: 'A seed of abundance falls into your palm — material and spiritual wealth begin to sprout. Seize this new opportunity and move forward steadily.' },
+  { name: '星币二', nameEn: 'Two of Pentacles', emoji: '🪙', desc: '在变化中保持灵活的平衡，生活的节奏需要你巧妙周旋。轻松应对，你比想象中更擅长。', descEn: 'Maintain nimble balance amid change — life\'s rhythm calls for skillful juggling. Handle it with ease; you are more adept than you think.' },
+  { name: '星币三', nameEn: 'Three of Pentacles', emoji: '🪙', desc: '合作与精湛的技艺正在结出硕果，你的才华得到了认可。团队的力量让梦想更快照进现实。', descEn: 'Collaboration and fine craftsmanship bear rich fruit — your talent is recognized. The power of teamwork brings dreams into reality faster.' },
+  { name: '星币四', nameEn: 'Four of Pentacles', emoji: '🪙', desc: '稳固的基础给你安全感，但也别忘了让能量流动。学会在守护与分享之间找到平衡。', descEn: 'A solid foundation brings security, but remember to let energy flow. Learn to balance between safeguarding and sharing.' },
+  { name: '星币五', nameEn: 'Five of Pentacles', emoji: '🪙', desc: '风雪中的艰难只是暂时的考验，援助的灯火近在咫尺。不要独自承受，温暖的大门正为你敞开。', descEn: 'Hardship in the cold is only a passing trial — help glows nearby. Do not bear it alone; a warm door stands open for you.' },
+  { name: '星币六', nameEn: 'Six of Pentacles', emoji: '🪙', desc: '慷慨与感恩在施与受之间流动，平衡的交换带来福报。分享你的丰盛，宇宙会加倍回馈。', descEn: 'Generosity and gratitude flow between giving and receiving — balanced exchange brings blessings. Share your abundance; the universe repays in multiples.' },
+  { name: '星币七', nameEn: 'Seven of Pentacles', emoji: '🪙', desc: '耐心等待播种的收获，默默耕耘终将开花结果。审视成果，调整方向，丰收不会辜负你的汗水。', descEn: 'Patiently await the harvest of what you have sown — quiet effort will bloom. Review your progress, adjust your course; the harvest will honor your toil.' },
+  { name: '星币八', nameEn: 'Eight of Pentacles', emoji: '🪙', desc: '专注与勤勉是通往精通的道路，每一次打磨都让你更加出色。沉浸在你的技艺中，匠心终成大器。', descEn: 'Focus and diligence pave the road to mastery — each refinement makes you better. Immerse yourself in your craft; dedication forges greatness.' },
+  { name: '星币九', nameEn: 'Nine of Pentacles', emoji: '🪙', desc: '独立与丰裕的果实环绕着你，这是你辛勤耕耘的回报。优雅地享受生活的美好，你值得这份安逸。', descEn: 'Independence and lush rewards surround you — the fruit of your devoted labor. Enjoy life\'s beauty with grace; you have earned this comfort.' },
+  { name: '星币十', nameEn: 'Ten of Pentacles', emoji: '🪙', desc: '世代传承的富足与家族的荣光在此汇聚。长久的安稳与繁荣正在你的生命中扎根。', descEn: 'Generational wealth and family legacy converge here. Lasting stability and prosperity are taking root in your life.' },
+  { name: '星币侍从', nameEn: 'Page of Pentacles', emoji: '🪙', desc: '怀揣实际的梦想，脚踏实地地学习新知。每一步小小的积累，都在为未来的丰收奠基。', descEn: 'Hold a practical dream and learn new things with feet firmly on the ground. Every small step of accumulation lays the foundation for future abundance.' },
+  { name: '星币骑士', nameEn: 'Knight of Pentacles', emoji: '🪙', desc: '坚定而稳健地朝目标前进，可靠是你最强的力量。踏实的每一步都在缩短你与成功的距离。', descEn: 'Advance toward your goal with steadfast reliability — dependability is your greatest strength. Every solid step closes the distance to success.' },
+  { name: '星币王后', nameEn: 'Queen of Pentacles', emoji: '🪙', desc: '以温暖的关怀营造丰饶的家园，滋养身边每一个生命。你的踏实与爱心让一切蓬勃生长。', descEn: 'Create an abundant home with warm nurturing, enriching every life around you. Your groundedness and love make all things flourish.' },
+  { name: '星币国王', nameEn: 'King of Pentacles', emoji: '🪙', desc: '以智慧与勤劳铸就坚实的成就，物质与精神同样富足。你是丰盛与慷慨的化身，值得信赖的守护者。', descEn: 'Forge solid achievements with wisdom and industry — rich in both material and spirit. You are the embodiment of abundance and generosity, a trustworthy guardian.' }
+];
+
+// ===== FORTUNE DESCRIPTIONS =====
+const fortuneDescs = [
+  { zh: '这是你闪耀蜕变的一年，勇敢追梦会收获意想不到的惊喜。上半年蓄力，下半年绽放！', en: 'A year of dazzling transformation — chasing dreams boldly brings unexpected surprises. Build up in the first half, bloom in the second!' },
+  { zh: '贵人运旺盛，真诚待人会打开意想不到的大门。年中有重要转折，保持开放心态！', en: 'Benefactor luck is strong — sincerity opens unexpected doors. A major turning point mid-year; stay open-minded!' },
+  { zh: '稳扎稳打是今年的关键词。虽然没有惊天大变，但每一步积累都在为未来铺路。', en: 'Steady progress is this year\'s theme. No dramatic changes, but every step builds toward a brilliant future.' },
+  { zh: '创意灵感如泉涌，适合开展新项目。感情上可能遇到让你心动的人，把握缘分！', en: 'Creative inspiration flows like a fountain — great for new projects. You may meet someone special in love; seize the connection!' },
+  { zh: '挑战虽多但都是成长的养分。下半年迎来收获期，之前的努力都不会白费！', en: 'Challenges abound but they are nourishment for growth. Harvest season arrives in the second half — your efforts won\'t be wasted!' },
+  { zh: '人际关系迎来黄金期！你的真诚付出将获得丰厚回报，年中可能收到让你感动的惊喜。', en: 'Relationships enter a golden period! Your sincerity will be richly rewarded — a touching surprise may come mid-year.' },
+  { zh: '财运亨通，大胆投资会有意想不到的回报。注意健康管理，劳逸结合才能走得更远。', en: 'Wealth fortune is booming — bold moves bring unexpected returns. Mind your health; balance work and rest to go further.' },
+  { zh: '这是深度学习和自我提升的好年份。沉淀下来的智慧将成为你未来最大的财富。', en: 'A great year for deep learning and self-improvement. The wisdom you cultivate will become your greatest future asset.' },
+  { zh: '感情运势超旺！无论单身还是有伴，都将遇到心灵深处的共鸣。创作灵感也将源源不断。', en: 'Love fortune is blazing! Whether single or taken, deep soul connections await. Creative inspiration will flow endlessly.' },
+  { zh: '事业上有贵人相助，把握每一次展示自己的机会。年底前可能有意想不到的好消息！', en: 'Career gets a boost from mentors — seize every chance to showcase yourself. Unexpectedly good news may arrive before year end!' }
+];
+
+// ===== COMBINE DATA BASED ON USERNAME HASH =====
+function hashStr(str, seed) {
+  let h = seed || 0;
+  for (let i = 0; i < str.length; i++) {
+    h = ((h << 5) - h) + str.charCodeAt(i);
+    h = h & h; // Convert to 32bit int
+  }
+  return Math.abs(h);
+}
+
+function getAnalysisData(username) {
+  const h1 = hashStr(username, 0);
+  const h2 = hashStr(username, 31);
+  const h3 = hashStr(username, 97);
+  const h4 = hashStr(username, 173);
+
+  const m = mbtiData[h1 % mbtiData.length];
+  const e = enneagramData[h2 % enneagramData.length];
+  const tr = tarotData[h3 % tarotData.length];
+  const fd = fortuneDescs[h4 % fortuneDescs.length];
+
+  // Generate deterministic fortune values from combined hash
+  const seed = h1 + h2 + h3;
+  const wealth = 55 + (hashStr(username, 200) % 40);  // 55-94
+  const love = 55 + (hashStr(username, 300) % 40);
+  const career = 55 + (hashStr(username, 400) % 40);
+  const luck = 55 + (hashStr(username, 500) % 40);
+  const avg = (wealth + love + career + luck) / 4;
+  const fortuneStars = avg >= 85 ? 5 : avg >= 72 ? 4 : avg >= 60 ? 3 : 2;
+
+  return {
+    mbti: m.code, mbtiName: m.name, mbtiNameEn: m.nameEn,
+    mbtiDesc: m.desc, mbtiDescEn: m.descEn,
+    mbtiTags: m.tags, mbtiTagsEn: m.tagsEn,
+    enneagram: e.type, enneagramEn: e.typeEn,
+    enneagramDesc: e.desc, enneagramDescEn: e.descEn,
+    enneagramTags: e.tags, enneagramTagsEn: e.tagsEn,
+    tarot: tr.name, tarotZh: tr.name, tarotEn: tr.nameEn, tarotEmoji: tr.emoji,
+    tarotDesc: tr.desc, tarotDescEn: tr.descEn,
+    fortuneStars, wealth, love, career, luck,
+    fortuneDesc: fd.zh, fortuneDescEn: fd.en
+  };
+}
 
 // ============ STATE ============
 let freeUsesLeft = 1;
@@ -1585,10 +1665,7 @@ function startAnalysis(username) {
 }
 
 function showResults(username) {
-  // Pick mock data based on username hash
-  let hash = 0;
-  for (let i = 0; i < username.length; i++) hash = ((hash << 5) - hash) + username.charCodeAt(i);
-  const data = mockData[Math.abs(hash) % mockData.length];
+  const data = getAnalysisData(username);
 
   // Save analysis result to Firebase
   saveAnalysisResult(username, data);
@@ -1654,9 +1731,7 @@ function generateShareCard() {
   const isEn = currentLang === 'en';
 
   // Get current result data
-  let hash = 0;
-  for (let i = 0; i < currentUsername.length; i++) hash = ((hash << 5) - hash) + currentUsername.charCodeAt(i);
-  const data = mockData[Math.abs(hash) % mockData.length];
+  const data = getAnalysisData(currentUsername);
 
   // === Background gradient ===
   const bgGrad = ctx.createLinearGradient(0, 0, W, H);
