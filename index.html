@@ -4,6 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cute Kitten</title>
+
+<!-- Open Graph / Twitter Card meta tags -->
+<meta property="og:title" content="Cute Kitten - Soul Analysis">
+<meta property="og:description" content="输入 @用户名，让Miu帮你照出隐藏的灵魂～ MBTI · 九型 · 塔罗 · 运势">
+<meta property="og:image" content="https://cutekitten.cn/og-card.png">
+<meta property="og:url" content="https://cutekitten.cn">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@_StarryMiu">
+<meta name="twitter:title" content="Cute Kitten - Soul Analysis">
+<meta name="twitter:description" content="输入 @用户名，让Miu帮你照出隐藏的灵魂～ MBTI · 九型 · 塔罗 · 运势">
+<meta name="twitter:image" content="https://cutekitten.cn/og-card.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -1892,23 +1905,52 @@ function downloadShareCard() {
 }
 
 function tweetWithCard() {
-  const canvas = document.getElementById('shareCardCanvas');
-  canvas.toBlob(function(blob) {
-    if (blob && navigator.clipboard && window.ClipboardItem) {
-      navigator.clipboard.write([
-        new ClipboardItem({ 'image/png': blob })
-      ]).then(function() {
-        const text = encodeURIComponent(t('shareText'));
-        window.open(`https://x.com/intent/tweet?text=${text}`, '_blank');
-      }).catch(function() {
-        const text = encodeURIComponent(t('shareText'));
-        window.open(`https://x.com/intent/tweet?text=${text}`, '_blank');
-      });
-    } else {
-      const text = encodeURIComponent(t('shareText'));
-      window.open(`https://x.com/intent/tweet?text=${text}`, '_blank');
-    }
-  }, 'image/png');
+  var canvas = document.getElementById('shareCardCanvas');
+  var tweetUrl = 'https://x.com/intent/tweet?text=' + encodeURIComponent(t('shareText'));
+
+  // On mobile, try Web Share API first (supports sharing files directly)
+  try {
+    canvas.toBlob(function(blob) {
+      if (!blob) { window.location.href = tweetUrl; return; }
+      var file = new File([blob], 'cute-kitten-soul.png', { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ text: t('shareText'), files: [file] }).catch(function() {});
+        return;
+      }
+      // No Web Share support — try clipboard, then redirect
+      if (navigator.clipboard && window.ClipboardItem) {
+        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(function() {
+          showCopyHint();
+        }).catch(function() {});
+      }
+      // Use location.href as fallback (won't be blocked on mobile)
+      window.location.href = tweetUrl;
+    }, 'image/png');
+  } catch(e) {
+    window.location.href = tweetUrl;
+  }
+}
+
+function copyAndTweet() {}
+
+function fallbackTweet() {
+  var text = encodeURIComponent(t('shareText'));
+  window.location.href = 'https://x.com/intent/tweet?text=' + text;
+}
+
+function showCopyHint() {
+  const hint = document.querySelector('.share-card-hint');
+  if (hint) {
+    hint.dataset.origText = hint.textContent;
+    hint.textContent = currentLang === 'zh'
+      ? '✅ 图片已复制到剪贴板！在推文窗口 Ctrl+V 粘贴即可~'
+      : '✅ Image copied to clipboard! Ctrl+V to paste in tweet~';
+    hint.style.color = '#7dffb3';
+    setTimeout(function() {
+      hint.textContent = hint.dataset.origText;
+      hint.style.color = '';
+    }, 5000);
+  }
 }
 
 function closeShareCard() {
