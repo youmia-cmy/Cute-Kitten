@@ -2158,11 +2158,11 @@ async function handleDonate() {
 
 async function handleDonateBSC() {
   setDonateStatus(t('donateConnecting'));
-  // Try MetaMask > OKX > TokenPocket
+  // Priority: OKX Wallet > MetaMask > TokenPocket > generic
   let provider = null;
-  if (window.ethereum?.isMetaMask) provider = window.ethereum;
+  if (window.okxwallet) provider = window.okxwallet;
+  else if (window.ethereum?.isMetaMask) provider = window.ethereum;
   else if (window.ethereum?.providers) provider = window.ethereum.providers.find(p => p.isMetaMask);
-  if (!provider && window.okxwallet) provider = window.okxwallet;
   if (!provider && window.tokenpocket?.ethereum) provider = window.tokenpocket.ethereum;
   if (!provider && window.ethereum) provider = window.ethereum;
   if (!provider) { setDonateStatus(t('donateNoWallet')); return; }
@@ -2204,14 +2204,14 @@ async function handleDonateBSC() {
 
 async function handleDonateSolana() {
   setDonateStatus(t('donateConnecting'));
+  // Priority: OKX Wallet > Phantom > TokenPocket > generic
   let solProvider = null;
-  if (window.phantom?.solana?.isPhantom) solProvider = window.phantom.solana;
+  if (window.okxwallet?.solana) solProvider = window.okxwallet.solana;
+  else if (window.phantom?.solana?.isPhantom) solProvider = window.phantom.solana;
   else if (window.solana?.isPhantom) solProvider = window.solana;
-  else if (window.okxwallet?.solana) solProvider = window.okxwallet.solana;
   else if (window.tokenpocket?.solana) solProvider = window.tokenpocket.solana;
 
   if (!solProvider) {
-    // Fallback: try generic solana
     if (window.solana) solProvider = window.solana;
     else { setDonateStatus(t('donateNoWallet')); return; }
   }
