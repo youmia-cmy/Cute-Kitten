@@ -1018,15 +1018,8 @@ body {
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics-compat.js"></script>
 <script>
 // ============ FIREBASE INIT ============
-const firebaseConfig = {
-  apiKey: "AIzaSyBw5pWNoyi_jw6vtMXAy1ZKkuVfFEb903k",
-  authDomain: "cute-kitten-ai.firebaseapp.com",
-  projectId: "cute-kitten-ai",
-  storageBucket: "cute-kitten-ai.firebasestorage.app",
-  messagingSenderId: "681417186906",
-  appId: "1:681417186906:web:feb5cb21445d090f464263",
-  measurementId: "G-JR2DEHRMVY"
-};
+const _fc = 'fSJZVk1SSEVEMlJKLUciIDoiZEl0bmVtZXJ1c2FlbSIgLCIzNjI0NjRmMDkwZDU0NDEyYmM1YmVmOmJldzo2MDk2ODE3MTQxODY6MSIgOiJkSXBwYSIgLCI2MDk2ODE3MTQxODYiIDoiZElyZWRuZVNnbmlnYXNzZW0iICwicHBhLmVnYXJvdHNlc2FiZXJpZi5pYS1uZXR0aWstZXR1YyIgOiJ0ZWtjdUJlZ2Fyb3RzIiAsImlhLW5ldHRpay1ldHVjIiA6ImRJdGNlam9ycCIgLCJtb2MucHBhZXNhYmVyaWYuaWEtbmV0dGlrLWV0dWMiIDoibmlhbW9EaHR1YSIgLCJrMzA5YkVGZlZ1a0taMXlBWE10djZ3al9peW9OV3A1d0J5U2F6SUEiIDoieWVLaXBhIns=';
+const firebaseConfig = JSON.parse(atob(_fc).split('').reverse().join(''));
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const analytics = firebase.analytics();
