@@ -691,6 +691,49 @@ body {
 @keyframes effectMsgIn { to { opacity: 1; } }
 @keyframes effectMsgOut { to { opacity: 0; } }
 
+/* === SHARE CARD OVERLAY === */
+#shareCardOverlay {
+  position: fixed; inset: 0; z-index: 350;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(10px);
+  padding: 20px;
+}
+#shareCardOverlay.hidden { display: none; }
+.share-card-preview {
+  max-width: 420px; width: 100%; border-radius: 20px; overflow: hidden;
+  box-shadow: 0 16px 60px rgba(0,0,0,0.5);
+  margin-bottom: 20px;
+}
+.share-card-preview img {
+  width: 100%; display: block;
+}
+.share-card-actions {
+  display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+}
+.share-card-actions button {
+  padding: 12px 28px; border-radius: 50px; border: none;
+  font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 0.9rem;
+  cursor: pointer; transition: transform 0.2s, box-shadow 0.3s;
+  display: flex; align-items: center; gap: 8px;
+}
+.share-card-actions .btn-download {
+  background: linear-gradient(135deg, var(--pink-hot), var(--purple-mid));
+  color: #fff; box-shadow: 0 4px 16px var(--glow-pink);
+}
+.share-card-actions .btn-tweet {
+  background: #1da1f2; color: #fff;
+  box-shadow: 0 4px 16px rgba(29,161,242,0.3);
+}
+.share-card-actions .btn-close-share {
+  background: rgba(160,130,210,0.15); color: var(--text-mid);
+  border: 1.5px solid rgba(160,130,210,0.25);
+}
+.share-card-actions button:hover { transform: translateY(-2px); }
+.share-card-hint {
+  margin-top: 14px; font-size: 0.78rem; color: var(--text-light);
+  text-align: center; max-width: 360px; line-height: 1.5;
+}
+
 /* === KEYFRAMES === */
 @keyframes orbFloat {
   0%, 100% { transform: translateY(0); }
@@ -1001,6 +1044,22 @@ body {
   </div>
 </div>
 
+<!-- SHARE CARD OVERLAY -->
+<div id="shareCardOverlay" class="hidden">
+  <div class="share-card-preview">
+    <canvas id="shareCardCanvas" width="840" height="1120"></canvas>
+  </div>
+  <div class="share-card-actions">
+    <button class="btn-download" onclick="downloadShareCard()" data-i18n="shareDownload">📥 保存图片</button>
+    <button class="btn-tweet" onclick="tweetWithCard()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="#fff"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      <span data-i18n="shareTweet">发布到 X</span>
+    </button>
+    <button class="btn-close-share" onclick="closeShareCard()" data-i18n="shareClose">关闭</button>
+  </div>
+  <p class="share-card-hint" data-i18n="shareHint">点击「发布到 X」会自动复制图片到剪贴板，在推文窗口中 Ctrl+V 粘贴即可~</p>
+</div>
+
 <!-- EFFECT CANVAS (for meteor/rain) -->
 <canvas id="effectCanvas" style="display:none"></canvas>
 
@@ -1209,7 +1268,7 @@ const i18n = {
     modalClose: '下次再说～',
     widgetText: 'Follow <a href="https://x.com/intent/follow?screen_name=_StarryMiu" target="_blank">@_StarryMiu</a> 获取每日免费机会 + 更多可爱解析～',
     navHome: '回到主页',
-    shareText: '我的X灵魂收据出炉了！超准（震惊）@_StarryMiu 帮我解析的～你们也快去测测！\n\n#StarryMiuAI #灵魂解析',
+    shareText: '我的X灵魂收据出炉了！超准（震惊）@_StarryMiu 帮我解析的～你们也快去测测！\n\nhttps://cutekitten.cn\n#StarryMiuAI',
     loadTexts: ['Miu正在窥探你的灵魂深处...', '正在翻阅星空中的记忆碎片...', '塔罗牌正在为你洗牌...', '月光照亮了你的性格密码...', '即将揭晓结果～'],
     payConnecting: '正在连接钱包...',
     payNoMetamask: '未检测到 MetaMask，请安装后重试',
@@ -1234,7 +1293,13 @@ const i18n = {
     feedbackTitle: '希望您能写下您不喜欢的原因 ◆',
     feedbackPlaceholder: '请输入您的意见...',
     feedbackSubmit: '提交',
-    feedbackThanks: '感谢您的宝贵意见'
+    feedbackThanks: '感谢您的宝贵意见',
+    shareDownload: '📥 保存图片',
+    shareTweet: '发布到 X',
+    shareClose: '关闭',
+    shareHint: '点击「发布到 X」会自动复制图片到剪贴板，在推文窗口中 Ctrl+V 粘贴即可~',
+    shareCardTitle: '灵魂解析报告',
+    shareCardBy: 'By Cute Kitten @_StarryMiu'
   },
   en: {
     heroTitle: '<span class="deco">✦</span> Enter any @username <span class="deco">♡</span><br>Let Miu reveal your hidden soul~ <span class="deco">✦</span>',
@@ -1264,7 +1329,7 @@ const i18n = {
     modalClose: 'Maybe next time~',
     widgetText: 'Follow <a href="https://x.com/intent/follow?screen_name=_StarryMiu" target="_blank">@_StarryMiu</a> for daily free readings + more cute analyses~',
     navHome: 'Back to home',
-    shareText: "My X soul receipt is out! So accurate (shocked) @_StarryMiu analyzed it for me~ Go try it too!\n\n#StarryMiuAI #SoulAnalysis",
+    shareText: "My X soul receipt is out! So accurate (shocked) @_StarryMiu analyzed it for me~ Go try it too!\n\nhttps://cutekitten.cn\n#StarryMiuAI",
     loadTexts: ['Miu is peeking into your soul...', 'Reading the memory fragments in the stars...', 'Shuffling the tarot cards for you...', 'Moonlight reveals your personality code...', 'About to reveal the results~'],
     payConnecting: 'Connecting wallet...',
     payNoMetamask: 'MetaMask not detected, please install and retry',
@@ -1289,7 +1354,13 @@ const i18n = {
     feedbackTitle: 'Please share why you didn\'t like it ◆',
     feedbackPlaceholder: 'Enter your feedback...',
     feedbackSubmit: 'Submit',
-    feedbackThanks: 'Thank you for your valuable feedback'
+    feedbackThanks: 'Thank you for your valuable feedback',
+    shareDownload: '📥 Save Image',
+    shareTweet: 'Post to X',
+    shareClose: 'Close',
+    shareHint: 'Click "Post to X" to auto-copy the image to clipboard, then Ctrl+V to paste in the tweet~',
+    shareCardTitle: 'Soul Analysis Report',
+    shareCardBy: 'By Cute Kitten @_StarryMiu'
   }
 };
 
@@ -1559,8 +1630,289 @@ function showResults(username) {
 }
 
 function shareToX() {
-  const text = encodeURIComponent(t('shareText'));
-  window.open(`https://x.com/intent/tweet?text=${text}&url=${encodeURIComponent('https://starrymiu.com')}`, '_blank');
+  generateShareCard();
+}
+
+function generateShareCard() {
+  const canvas = document.getElementById('shareCardCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = 840, H = 1120;
+  canvas.width = W; canvas.height = H;
+  const isEn = currentLang === 'en';
+
+  // Get current result data
+  let hash = 0;
+  for (let i = 0; i < currentUsername.length; i++) hash = ((hash << 5) - hash) + currentUsername.charCodeAt(i);
+  const data = mockData[Math.abs(hash) % mockData.length];
+
+  // === Background gradient ===
+  const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+  bgGrad.addColorStop(0, '#0c0a14');
+  bgGrad.addColorStop(0.4, '#14101e');
+  bgGrad.addColorStop(0.7, '#180e20');
+  bgGrad.addColorStop(1, '#0c0a14');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Decorative circles
+  ctx.globalAlpha = 0.12;
+  const cGrad1 = ctx.createRadialGradient(150, 150, 0, 150, 150, 300);
+  cGrad1.addColorStop(0, '#7840b8'); cGrad1.addColorStop(1, 'transparent');
+  ctx.fillStyle = cGrad1; ctx.fillRect(0, 0, W, H);
+  const cGrad2 = ctx.createRadialGradient(700, 900, 0, 700, 900, 350);
+  cGrad2.addColorStop(0, '#b83878'); cGrad2.addColorStop(1, 'transparent');
+  ctx.fillStyle = cGrad2; ctx.fillRect(0, 0, W, H);
+  ctx.globalAlpha = 1;
+
+  // Draw small stars
+  for (let i = 0; i < 30; i++) {
+    const sx = Math.random() * W, sy = Math.random() * H;
+    const sr = 1 + Math.random() * 2;
+    ctx.globalAlpha = 0.2 + Math.random() * 0.5;
+    ctx.fillStyle = ['#c9a0ff', '#ff7eb3', '#8eb8e8', '#ffd97a'][Math.floor(Math.random() * 4)];
+    ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // === Header ===
+  let y = 60;
+  ctx.fillStyle = '#8070a0';
+  ctx.font = '600 22px Quicksand, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('✦ ' + t('shareCardBy') + ' ✦', W / 2, y);
+
+  // === Username ===
+  y = 120;
+  ctx.fillStyle = '#c9a0ff';
+  ctx.font = '800 48px Nunito, Quicksand, sans-serif';
+  ctx.fillText('@' + currentUsername, W / 2, y);
+
+  // Sub text
+  y = 160;
+  ctx.fillStyle = '#8070a0';
+  ctx.font = '600 22px Quicksand, sans-serif';
+  ctx.fillText(t('shareCardTitle'), W / 2, y);
+
+  // === Divider ===
+  y = 185;
+  const divGrad = ctx.createLinearGradient(120, y, W - 120, y);
+  divGrad.addColorStop(0, 'transparent');
+  divGrad.addColorStop(0.3, 'rgba(201,160,255,0.3)');
+  divGrad.addColorStop(0.7, 'rgba(255,126,179,0.3)');
+  divGrad.addColorStop(1, 'transparent');
+  ctx.strokeStyle = divGrad; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(120, y); ctx.lineTo(W - 120, y); ctx.stroke();
+
+  // Helper: draw a card section
+  function drawCard(x, cy, w, h, icon, label, title, desc, tags) {
+    // Card bg
+    ctx.fillStyle = 'rgba(20,16,35,0.65)';
+    ctx.strokeStyle = 'rgba(160,130,210,0.15)';
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, x, cy, w, h, 20);
+
+    // Icon
+    ctx.font = '32px serif';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(icon, x + 22, cy + 42);
+
+    // Label
+    ctx.fillStyle = '#8070a0';
+    ctx.font = '600 16px Quicksand, sans-serif';
+    ctx.fillText(label, x + 62, cy + 30);
+
+    // Title
+    ctx.fillStyle = '#c9a0ff';
+    ctx.font = '800 24px Nunito, Quicksand, sans-serif';
+    ctx.fillText(title, x + 62, cy + 56);
+
+    // Desc (wrap text)
+    ctx.fillStyle = '#b8a0d8';
+    ctx.font = '500 17px Quicksand, sans-serif';
+    wrapText(ctx, desc, x + 22, cy + 86, w - 44, 24);
+
+    // Tags
+    if (tags && tags.length) {
+      let tx = x + 22;
+      const ty = cy + h - 32;
+      ctx.font = '600 14px Quicksand, sans-serif';
+      tags.forEach(tag => {
+        const tw = ctx.measureText(tag).width + 20;
+        ctx.fillStyle = 'rgba(160,130,210,0.15)';
+        roundRect(ctx, tx, ty - 14, tw, 26, 13, true);
+        ctx.fillStyle = '#a97edb';
+        ctx.fillText(tag, tx + 10, ty + 4);
+        tx += tw + 8;
+      });
+    }
+  }
+
+  // === MBTI Card ===
+  y = 205;
+  drawCard(40, y, W - 80, 190, '🧠',
+    isEn ? 'MBTI Personality' : 'MBTI 人格',
+    data.mbti + ' · ' + (isEn ? data.mbtiNameEn : data.mbtiName),
+    isEn ? data.mbtiDescEn : data.mbtiDesc,
+    isEn ? data.mbtiTagsEn : data.mbtiTags
+  );
+
+  // === Enneagram Card ===
+  y = 415;
+  drawCard(40, y, W - 80, 190, '🌀',
+    isEn ? 'Enneagram' : '九型人格',
+    isEn ? data.enneagramEn : data.enneagram,
+    isEn ? data.enneagramDescEn : data.enneagramDesc,
+    isEn ? data.enneagramTagsEn : data.enneagramTags
+  );
+
+  // === Tarot Card ===
+  y = 625;
+  drawCard(40, y, W - 80, 170, '🃏',
+    isEn ? 'Tarot Card' : '塔罗牌',
+    (isEn ? data.tarotEn : (data.tarotZh || data.tarot)) + ' ' + data.tarotEmoji,
+    isEn ? data.tarotDescEn : data.tarotDesc,
+    null
+  );
+
+  // === Fortune Card ===
+  y = 815;
+  const fortuneLabel = isEn ? 'Fortune' : '运势';
+  const fortuneTitle = isEn ? 'Overall Fortune' : '综合运势';
+  ctx.fillStyle = 'rgba(20,16,35,0.65)';
+  ctx.strokeStyle = 'rgba(160,130,210,0.15)';
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, 40, y, W - 80, 200, 20);
+
+  ctx.font = '32px serif'; ctx.textAlign = 'left'; ctx.fillStyle = '#fff';
+  ctx.fillText('🌟', 62, y + 42);
+  ctx.fillStyle = '#8070a0'; ctx.font = '600 16px Quicksand, sans-serif';
+  ctx.fillText(fortuneLabel, 102, y + 30);
+  ctx.fillStyle = '#c9a0ff'; ctx.font = '800 24px Nunito, Quicksand, sans-serif';
+  ctx.fillText(fortuneTitle, 102, y + 56);
+
+  // Stars
+  let starX = 62;
+  for (let i = 0; i < 5; i++) {
+    ctx.globalAlpha = i < data.fortuneStars ? 1 : 0.25;
+    ctx.font = '22px serif';
+    ctx.fillText('⭐', starX, y + 84);
+    starX += 30;
+  }
+  ctx.globalAlpha = 1;
+
+  // Fortune bars
+  const bars = [
+    { label: isEn ? '💰 Wealth' : '💰 财运', val: data.wealth },
+    { label: isEn ? '💕 Love' : '💕 感情', val: data.love },
+    { label: isEn ? '💼 Career' : '💼 事业', val: data.career },
+    { label: isEn ? '🍀 Luck' : '🍀 运气', val: data.luck }
+  ];
+  let by = y + 105;
+  bars.forEach(b => {
+    ctx.fillStyle = '#b8a0d8'; ctx.font = '500 16px Quicksand, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(b.label, 62, by);
+    // Bar bg
+    ctx.fillStyle = 'rgba(200,179,232,0.15)';
+    roundRect(ctx, 200, by - 10, 400, 10, 5, true);
+    // Bar fill
+    const barGrad = ctx.createLinearGradient(200, 0, 200 + 400 * b.val / 100, 0);
+    barGrad.addColorStop(0, '#ff7eb3'); barGrad.addColorStop(1, '#a97edb');
+    ctx.fillStyle = barGrad;
+    roundRect(ctx, 200, by - 10, 400 * b.val / 100, 10, 5, true);
+    // Percentage
+    ctx.fillStyle = '#8070a0'; ctx.font = '600 14px Quicksand, sans-serif';
+    ctx.fillText(b.val + '%', 612, by);
+    by += 26;
+  });
+
+  // === Footer ===
+  y = 1060;
+  ctx.fillStyle = '#8070a0';
+  ctx.font = '500 18px Quicksand, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('✦ cutekitten.cn · Remember to smile~ ✦', W / 2, y);
+
+  // Footer decoration
+  y = 1090;
+  ctx.fillStyle = '#5a4880';
+  ctx.font = '400 14px Quicksand, sans-serif';
+  ctx.fillText('#StarryMiuAI', W / 2, y);
+
+  // Show overlay
+  // Scale canvas for display
+  canvas.style.width = '100%';
+  canvas.style.height = 'auto';
+  canvas.style.borderRadius = '20px';
+  document.getElementById('shareCardOverlay').classList.remove('hidden');
+}
+
+function roundRect(ctx, x, y, w, h, r, fillOnly) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.fill();
+  if (!fillOnly) ctx.stroke();
+}
+
+function wrapText(ctx, text, x, y, maxW, lineH) {
+  const chars = text.split('');
+  let line = '';
+  let lines = 0;
+  for (let i = 0; i < chars.length; i++) {
+    const test = line + chars[i];
+    if (ctx.measureText(test).width > maxW && line) {
+      ctx.fillText(line, x, y);
+      line = chars[i];
+      y += lineH;
+      lines++;
+      if (lines >= 3) { ctx.fillText(line + '...', x, y); return; }
+    } else {
+      line = test;
+    }
+  }
+  ctx.fillText(line, x, y);
+}
+
+function downloadShareCard() {
+  const canvas = document.getElementById('shareCardCanvas');
+  const link = document.createElement('a');
+  link.download = 'cute-kitten-soul-' + currentUsername + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function tweetWithCard() {
+  const canvas = document.getElementById('shareCardCanvas');
+  canvas.toBlob(function(blob) {
+    if (blob && navigator.clipboard && window.ClipboardItem) {
+      navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob })
+      ]).then(function() {
+        const text = encodeURIComponent(t('shareText'));
+        window.open(`https://x.com/intent/tweet?text=${text}`, '_blank');
+      }).catch(function() {
+        const text = encodeURIComponent(t('shareText'));
+        window.open(`https://x.com/intent/tweet?text=${text}`, '_blank');
+      });
+    } else {
+      const text = encodeURIComponent(t('shareText'));
+      window.open(`https://x.com/intent/tweet?text=${text}`, '_blank');
+    }
+  }, 'image/png');
+}
+
+function closeShareCard() {
+  document.getElementById('shareCardOverlay').classList.add('hidden');
 }
 
 function goHome() {
