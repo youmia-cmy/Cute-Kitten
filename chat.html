@@ -220,8 +220,14 @@ body {
 
 /* Responsive */
 @media (max-width: 480px) {
-  .page-title { font-size: 0.85rem; }
-  .back-btn { font-size: 0.72rem; padding: 5px 12px; }
+  #topBar { padding: 8px 10px; }
+  .top-left { gap: 6px; }
+  .back-btn { font-size: 0.65rem; padding: 4px 10px; white-space: nowrap; }
+  .page-title { font-size: 0.75rem; white-space: nowrap; }
+  .heart-beat { margin-left: 4px; margin-right: 0; font-size: 0.7rem; }
+  .nick-display { font-size: 0.58rem; margin-left: 2px; max-width: 50px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
+  .lang-toggle { font-size: 0.6rem; }
+  .lang-btn { padding: 3px 7px; }
   .msg-bubble { max-width: 80%; }
 }
 </style>
@@ -293,8 +299,8 @@ body {
     <p data-i18n="payDesc">升级后Cute Kitten会变得更聪明，懂加密货币，帮你分析行情喵~</p>
     <div class="pay-price">5.99 USDT</div>
     <div class="pay-methods">
-      <button class="pay-btn" onclick="payWithWallet('okx')" data-i18n="payOkx">OKX Wallet 支付</button>
-      <button class="pay-btn" onclick="payWithWallet('tp')" data-i18n="payTp">TokenPocket 支付</button>
+      <button class="pay-btn" onclick="payWithWallet('okx')" data-i18n="payOkx">OKX Wallet</button>
+      <button class="pay-btn" onclick="payWithWallet('tp')" data-i18n="payTp">TokenPocket</button>
     </div>
     <div class="pay-chains">
       <span data-i18n="payChains">支持 USDT / SOL 支付</span>
@@ -711,8 +717,8 @@ const i18nDict = {
     upgradeBtn: '升级高级版',
     payTitle: '解锁高级Cute Kitten',
     payDesc: '升级后Cute Kitten会变得更聪明，懂加密货币，帮你分析行情喵~',
-    payOkx: 'OKX Wallet 支付',
-    payTp: 'TokenPocket 支付',
+    payOkx: 'OKX Wallet',
+    payTp: 'TokenPocket',
     payChains: '支持 USDT / SOL 支付',
     payConnecting: '正在连接钱包...',
     payConfirming: '请在钱包中确认支付...',
@@ -737,8 +743,8 @@ const i18nDict = {
     upgradeBtn: 'Upgrade to Premium',
     payTitle: 'Unlock Premium Cute Kitten',
     payDesc: 'Premium Cute Kitten is smarter, knows crypto, and can help analyze markets meow~',
-    payOkx: 'OKX Wallet Pay',
-    payTp: 'TokenPocket Pay',
+    payOkx: 'OKX Wallet',
+    payTp: 'TokenPocket',
     payChains: 'Supports USDT / SOL payment',
     payConnecting: 'Connecting wallet...',
     payConfirming: 'Please confirm in wallet...',
