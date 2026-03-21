@@ -800,6 +800,22 @@ body {
 
 /* === RESPONSIVE === */
 @media (max-width: 640px) {
+  #mainNav { padding: 10px 12px; }
+  .nav-avatar-img { width: 32px; height: 32px; }
+  .nav-name { font-size: 0.9rem; }
+  .nav-right { gap: 6px; }
+  .nav-name-link { display: none; }
+  .nav-right .nav-home-btn[data-i18n="navChat"],
+  .nav-right .nav-home-btn[data-i18n="navCatGame"] {
+    font-size: 0.62rem !important;
+    padding: 0 10px !important;
+    height: 30px;
+    white-space: nowrap;
+  }
+  .nav-right .nav-home-btn { width: 30px; height: 30px; }
+  .nav-right .nav-home-btn svg { width: 16px; height: 16px; }
+  .lang-toggle { font-size: 0.6rem; }
+  .lang-btn { padding: 3px 7px; }
   .hero-title { font-size: 1.35rem; }
   .btn-row { flex-direction: column; align-items: stretch; }
   .btn-primary, .btn-secondary { justify-content: center; font-size: 0.88rem; padding: 13px 20px; }
@@ -1020,9 +1036,9 @@ body {
     <p class="modal-desc" data-i18n="modalDesc">支付 1 USDT 继续解析？<br>（BSC链 USDT，gas超便宜）</p>
     <div class="modal-price">💎 1 USDT (BEP-20)</div>
     <div class="modal-pay-btns">
-      <button class="modal-pay-btn metamask" onclick="handleWalletPayment('metamask')"><span data-i18n="payMetamask">🦊 MetaMask 支付</span></button>
-      <button class="modal-pay-btn okx" onclick="handleWalletPayment('okx')"><span data-i18n="payOkx">OKX Wallet 支付</span></button>
-      <button class="modal-pay-btn tp" onclick="handleWalletPayment('tokenpocket')"><span data-i18n="payTp">💼 TokenPocket 支付</span></button>
+      <button class="modal-pay-btn metamask" onclick="handleWalletPayment('metamask')"><span data-i18n="payMetamask">🦊 MetaMask</span></button>
+      <button class="modal-pay-btn okx" onclick="handleWalletPayment('okx')"><span data-i18n="payOkx">OKX Wallet</span></button>
+      <button class="modal-pay-btn tp" onclick="handleWalletPayment('tokenpocket')"><span data-i18n="payTp">💼 TokenPocket</span></button>
     </div>
     <p class="modal-wallet-hint" id="paymentStatus"></p>
     <button class="modal-close" onclick="closePaymentModal()" data-i18n="modalClose">下次再说～</button>
@@ -1281,9 +1297,9 @@ const i18n = {
     backBtn: '← 再测一个朋友',
     modalTitle: 'Miu的免费次数用光啦～',
     modalDesc: '支付 1 USDT 继续解析？<br>（BSC链 USDT，gas超便宜）',
-    payMetamask: '🦊 MetaMask 支付',
-    payOkx: 'OKX Wallet 支付',
-    payTp: '💼 TokenPocket 支付',
+    payMetamask: '🦊 MetaMask',
+    payOkx: 'OKX Wallet',
+    payTp: '💼 TokenPocket',
     modalClose: '下次再说～',
     widgetText: 'Follow <a href="https://x.com/_StarryMiu" target="_blank">Cute Kitten</a> 获取每日免费机会 + 更多可爱解析～',
     navHome: '回到主页',
@@ -1346,9 +1362,9 @@ const i18n = {
     backBtn: '← Analyze another friend',
     modalTitle: "Miu's free uses are all gone~",
     modalDesc: 'Pay 1 USDT to continue?<br>(BSC chain USDT, super low gas)',
-    payMetamask: '🦊 MetaMask Pay',
-    payOkx: 'OKX Wallet Pay',
-    payTp: '💼 TokenPocket Pay',
+    payMetamask: '🦊 MetaMask',
+    payOkx: 'OKX Wallet',
+    payTp: '💼 TokenPocket',
     modalClose: 'Maybe next time~',
     widgetText: 'Follow <a href="https://x.com/_StarryMiu" target="_blank">Cute Kitten</a> for daily free readings + more cute analyses~',
     navHome: 'Back to home',
