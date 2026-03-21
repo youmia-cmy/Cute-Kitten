@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>猫猫接球 - Cute Kitten</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --purple-deep: #c9a0ff; --purple-mid: #a97edb;
+  --purple-light: rgba(160,130,210,0.35); --pink-hot: #ff7eb3;
+  --pink-soft: #ffb3d9; --blue-soft: #8eb8e8;
+  --gold-star: #ffd97a; --bg-cream: #0c0a14;
+  --text-dark: #ede4ff; --text-mid: #b8a0d8; --text-light: #8070a0;
+  --card-bg: rgba(20,16,35,0.75);
+  --glow-pink: rgba(255,126,179,0.35); --glow-purple: rgba(160,120,220,0.35);
+}
+html, body { width: 100%; height: 100%; overflow: hidden; }
+body {
+  font-family: 'Zen Maru Gothic', 'Quicksand', sans-serif;
+  background: var(--bg-cream); color: var(--text-dark);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background:
+    radial-gradient(ellipse at 15% 15%, rgba(120,60,180,0.25) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 20%, rgba(60,90,180,0.25) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 75%, rgba(180,60,120,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 75% 55%, rgba(140,50,160,0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 25% 60%, rgba(80,60,200,0.12) 0%, transparent 50%),
+    linear-gradient(160deg, #0c0a14 0%, #12101e 25%, #140e1e 50%, #100e1a 75%, #0c0a14 100%);
+  -webkit-font-smoothing: antialiased;
+}
+#topBar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 20px; background: rgba(12,10,20,0.92);
+  backdrop-filter: blur(8px); border-bottom: 1px solid rgba(160,130,210,0.15);
+}
+.top-left { display: flex; align-items: center; gap: 12px; }
+.back-btn {
+  display: flex; align-items: center; gap: 6px; padding: 6px 16px;
+  border-radius: 50px; border: 1.5px solid rgba(160,130,210,0.25);
+  background: rgba(20,16,35,0.6); color: var(--purple-mid);
+  font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 0.82rem;
+  cursor: pointer; transition: all 0.25s; text-decoration: none;
+}
+.back-btn:hover { border-color: var(--pink-hot); color: var(--pink-hot);
+  background: rgba(255,126,179,0.1); transform: scale(1.05); }
+.game-title {
+  font-family: 'Nunito', sans-serif; font-weight: 800;
+  font-size: 1.1rem; color: var(--purple-deep);
+}
+.game-title span { color: var(--pink-hot); }
+.top-right { display: flex; align-items: center; gap: 14px;
+  font-family: 'Quicksand', sans-serif; font-weight: 600; font-size: 0.85rem; }
+.stat { color: var(--text-mid); }
+.stat b { color: var(--gold-star); }
+#gameWrapper {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  margin-top: 56px; width: 100%; flex: 1;
+}
+canvas#gameCanvas {
+  display: block; border-radius: 16px;
+  box-shadow: 0 0 40px rgba(160,120,220,0.15), 0 0 80px rgba(255,126,179,0.08);
+  border: 1.5px solid rgba(160,130,210,0.18);
+  background: rgba(10,8,18,0.85); touch-action: none;
+}
+/* Overlay screens */
+.overlay {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(12,10,20,0.92); backdrop-filter: blur(12px);
+}
+.overlay.hidden { display: none; }
+.overlay h2 {
+  font-family: 'Nunito', sans-serif; font-weight: 800;
+  font-size: clamp(1.4rem, 4vw, 2rem); color: var(--purple-deep);
+  margin-bottom: 12px; text-align: center;
+}
+.overlay h2 span { color: var(--pink-hot); }
+.overlay p {
+  color: var(--text-mid); font-size: 0.95rem; margin-bottom: 24px;
+  text-align: center; max-width: 360px; line-height: 1.7;
+}
+.overlay .btn-play {
+  padding: 14px 36px; border-radius: 50px; border: none;
+  background: linear-gradient(135deg, var(--pink-hot), var(--purple-mid));
+  color: #fff; font-family: 'Quicksand', sans-serif; font-weight: 700;
+  font-size: 1rem; cursor: pointer; position: relative; overflow: hidden;
+  box-shadow: 0 4px 20px var(--glow-pink);
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+.overlay .btn-play:hover { transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 32px var(--glow-pink); }
+.overlay .btn-play:active { transform: scale(0.97); }
+.overlay .btn-secondary {
+  margin-top: 12px; padding: 10px 28px; border-radius: 50px;
+  border: 1.5px solid var(--purple-light); background: transparent;
+  color: var(--purple-mid); font-family: 'Quicksand', sans-serif;
+  font-weight: 700; font-size: 0.9rem; cursor: pointer;
+  transition: all 0.25s;
+}
+.overlay .btn-secondary:hover { border-color: var(--pink-hot); color: var(--pink-hot); }
+.powerup-legend {
+  display: flex; gap: 20px; margin-bottom: 20px;
+  font-size: 0.82rem; color: var(--text-light);
+}
+.powerup-legend div { display: flex; align-items: center; gap: 6px; }
+.powerup-legend .icon { font-size: 1.1rem; }
+/* Language toggle */
+.lang-toggle {
+  display: flex; gap: 0; border-radius: 50px; overflow: hidden;
+  border: 1.5px solid rgba(160,130,210,0.25);
+  background: rgba(20,16,35,0.6);
+}
+.lang-btn {
+  padding: 4px 12px; font-family: 'Quicksand', sans-serif;
+  font-weight: 700; font-size: 0.72rem; border: none;
+  background: transparent; color: var(--text-mid);
+  cursor: pointer; transition: all 0.25s;
+}
+.lang-btn.active {
+  background: linear-gradient(135deg, var(--pink-hot), var(--purple-mid));
+  color: #fff;
+}
+@media (max-width: 600px) {
+  .game-title { font-size: 0.9rem; }
+  .top-right { gap: 8px; font-size: 0.75rem; }
+  .back-btn { padding: 5px 10px; font-size: 0.75rem; }
+  .lang-btn { padding: 3px 8px; font-size: 0.65rem; }
+}
+</style>
+</head>
+<body>
+<!-- Top Bar -->
+<div id="topBar">
+  <div class="top-left">
+    <a href="index.html" class="back-btn" data-i18n="backBtn">← 返回首页</a>
+    <div class="game-title" data-i18n="topBarTitle"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAYCAYAAADKx8xXAAAElUlEQVR42oWUa2yTdRjFz/P/v5du7GK3whhsMnaB3bIJTBkrMAMSgjjUyWYYZJkQlMTMBDEmqFBriEFiiIhEEAiCNygqfsCQoMYLSsZkyG0bbKPb2NZdu1G7lrV9+z5+QAzfPJ9Pzjlfzg+1y1bu2PRUzYcALADALpYOQOB/JOL05B57Vl39x1v3/VFXaa+gaoo6QabD4VAA0INmh8MhXFVVEgCwrmLRkn1130fdv9zhvtttvHPLW65pwCwAEEKivLxccQDC5XLJBzIIpaUJ2e/VHPLf/NUTZWaj4UgHf/TyId/br2/cen/+/eLnFpct2ly3+iUAkL29odEny1bULVu7yBalABpOus2s3PyYms2rl2bZ0ipM77A/6Osz16+prNn4QuUXaanJqzpvDR5XilKshUn5xl39IQXupjvwD03I9OIwq3qcWZL7dHHoidHPX9u+IZpgiZeit4mFTOAFZXMXKvWvrL9gmyxjg/4grp/pF6pFxYw5SQRAXm28aqZlW7m4qFj6fAFzzDfVtABKQnx8skibZtON4dv46XALhjr8SCuOx/S8VPS2DcA7fkkUlGRK7/AYGxFD2HJLJBKnY6C7q1tMRNHOYeauxkEzPW867DX56OnqxLkfv8KSVblQhA4QEcAwzSiEqiEaDUMWZs5MLJxXsNTd4eEM+yS63XcFXdcvYO6cbMRNikcoHIKqqgAA0zRNa2KCGBoaZflzw6XLy8vLKpY8Mzsl4O8xbfEa5RfOBrNAOByGoqoIjgdAUkCQpJhYnUa8Q0kCgH/EO/pXyuRpyMrKYastGR0dXQgGxqGqKgxjAhebGuG+dhO6ytTROoDmxpEUAYCMcCQQmphgk6M8MuhF27WbCAYm4BkcxJ8NPUiw5CESScbZ77pMf1BlgH0KAB4YHLphGAYxCVgiEvbsIlhSbBjz+ZCcLKApErFWBTNzbcLEOChu5F1JRGCfbzhnduaGjIx0XcaooESNjKiBGE3HlNRJsNosSIyLMYe9/d4Pdh/cv+ez007pqqqS7/92fmzXtjdHo1FjxXgwCEtsLGmaBmZGJGJCVXTuaO+iY0eOt66rrS4qyEybJQCAiDhssru09FGZZLWi/UY7mBkgQAqCYRg0NXUK7di5reSR4oKcwPh4SJ5saVHf2LT21fbOriEC+fML8+Zl52RRJBIhIgKIwGxC13U+f64htP+TY1t3Hz31jgLAWjp/7q7KZ1d47cvXPf/l9NSV5YvtD5sms5SCAICZWVUUUjUNB785e5SITAlCIDlW7368vGzNsvL5tTEWS8zkFJs0jCgR/fdFEkKyxaKpPk/fmWu3eroVx3aHcDqdn0buhkz7wsf2zsrNSTAMg5n5X2wwmO/1CiIiIQQAFk6n03S5quSBU2eP1W7ZsaCvr9+jaSpLRZqaprOm6awo0lSkoN6+/sDlq+42IrpHs+rqk9E9e+p1AC0Xm64ckETC7/tb9Hs8NODpJ9+YT2iqSud/v3Cg2ePpOXHihFTu02d0dG/EAYiW9ltff3/6h/rm662HOjvd5wAgfUZG2Zzighdbb7QdBkDNzc38D3YsCUDmHxWPAAAAAElFTkSuQmCC" alt="猫猫" style="height:20px;vertical-align:middle;margin-right:4px;"> 猫猫<span>接球</span></div>
+  </div>
+  <div class="top-right">
+    <div class="stat"><span data-i18n="statLevel">关卡</span> <b id="levelDisplay">1</b>/100</div>
+    <div class="stat"><span data-i18n="statScore">分数</span> <b id="scoreDisplay">0</b></div>
+    <div class="stat"><span data-i18n="statBall">球</span> <b id="ballDisplay">1</b></div>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('zh')">中文</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</div>
+
+<!-- Game Canvas -->
+<div id="gameWrapper">
+  <canvas id="gameCanvas"></canvas>
+</div>
+
+<!-- Start Screen -->
+<div class="overlay" id="startScreen">
+  <h2><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAYCAYAAADKx8xXAAAElUlEQVR42oWUa2yTdRjFz/P/v5du7GK3whhsMnaB3bIJTBkrMAMSgjjUyWYYZJkQlMTMBDEmqFBriEFiiIhEEAiCNygqfsCQoMYLSsZkyG0bbKPb2NZdu1G7lrV9+z5+QAzfPJ9Pzjlfzg+1y1bu2PRUzYcALADALpYOQOB/JOL05B57Vl39x1v3/VFXaa+gaoo6QabD4VAA0INmh8MhXFVVEgCwrmLRkn1130fdv9zhvtttvHPLW65pwCwAEEKivLxccQDC5XLJBzIIpaUJ2e/VHPLf/NUTZWaj4UgHf/TyId/br2/cen/+/eLnFpct2ly3+iUAkL29odEny1bULVu7yBalABpOus2s3PyYms2rl2bZ0ipM77A/6Osz16+prNn4QuUXaanJqzpvDR5XilKshUn5xl39IQXupjvwD03I9OIwq3qcWZL7dHHoidHPX9u+IZpgiZeit4mFTOAFZXMXKvWvrL9gmyxjg/4grp/pF6pFxYw5SQRAXm28aqZlW7m4qFj6fAFzzDfVtABKQnx8skibZtON4dv46XALhjr8SCuOx/S8VPS2DcA7fkkUlGRK7/AYGxFD2HJLJBKnY6C7q1tMRNHOYeauxkEzPW867DX56OnqxLkfv8KSVblQhA4QEcAwzSiEqiEaDUMWZs5MLJxXsNTd4eEM+yS63XcFXdcvYO6cbMRNikcoHIKqqgAA0zRNa2KCGBoaZflzw6XLy8vLKpY8Mzsl4O8xbfEa5RfOBrNAOByGoqoIjgdAUkCQpJhYnUa8Q0kCgH/EO/pXyuRpyMrKYastGR0dXQgGxqGqKgxjAhebGuG+dhO6ytTROoDmxpEUAYCMcCQQmphgk6M8MuhF27WbCAYm4BkcxJ8NPUiw5CESScbZ77pMf1BlgH0KAB4YHLphGAYxCVgiEvbsIlhSbBjz+ZCcLKApErFWBTNzbcLEOChu5F1JRGCfbzhnduaGjIx0XcaooESNjKiBGE3HlNRJsNosSIyLMYe9/d4Pdh/cv+ez007pqqqS7/92fmzXtjdHo1FjxXgwCEtsLGmaBmZGJGJCVXTuaO+iY0eOt66rrS4qyEybJQCAiDhssru09FGZZLWi/UY7mBkgQAqCYRg0NXUK7di5reSR4oKcwPh4SJ5saVHf2LT21fbOriEC+fML8+Zl52RRJBIhIgKIwGxC13U+f64htP+TY1t3Hz31jgLAWjp/7q7KZ1d47cvXPf/l9NSV5YvtD5sms5SCAICZWVUUUjUNB785e5SITAlCIDlW7368vGzNsvL5tTEWS8zkFJs0jCgR/fdFEkKyxaKpPk/fmWu3eroVx3aHcDqdn0buhkz7wsf2zsrNSTAMg5n5X2wwmO/1CiIiIQQAFk6n03S5quSBU2eP1W7ZsaCvr9+jaSpLRZqaprOm6awo0lSkoN6+/sDlq+42IrpHs+rqk9E9e+p1AC0Xm64ckETC7/tb9Hs8NODpJ9+YT2iqSud/v3Cg2ePpOXHihFTu02d0dG/EAYiW9ltff3/6h/rm662HOjvd5wAgfUZG2Zzighdbb7QdBkDNzc38D3YsCUDmHxWPAAAAAElFTkSuQmCC" alt="猫猫" style="height:28px;vertical-align:middle;margin-right:4px;"> <span data-i18n="gameTitle">猫猫<span>接球</span></span></h2>
+  <p data-i18n="gameDesc">操控猫猫举着板子接住弹球，击碎所有砖块！<br>砖块里藏着猫粮和猫条哦～</p>
+  <div class="powerup-legend">
+    <div><span class="icon">🐟</span> <span data-i18n="powerupFood">猫粮 → 裂变10球</span></div>
+    <div><span class="icon">🍖</span> <span data-i18n="powerupTreat">猫条 → 裂变50球</span></div>
+  </div>
+  <button class="btn-play" onclick="startGame()" data-i18n="btnStart">开始游戏 🎮</button>
+</div>
+
+<!-- Level Complete Screen -->
+<div class="overlay hidden" id="levelCompleteScreen">
+  <h2>🎉 恭喜通过<span>第 <span id="completedLevel">1</span> 关</span>！</h2>
+  <p id="levelCompleteMsg" data-i18n="levelCompleteMsg">准备好迎接下一关了吗？</p>
+  <button class="btn-play" id="nextLevelBtn" onclick="nextLevel()" data-i18n="btnNextLevel">进入下一关 →</button>
+  <button class="btn-secondary" onclick="goHome()" data-i18n="btnHome">返回首页</button>
+</div>
+
+<!-- Game Over Screen -->
+<div class="overlay hidden" id="gameOverScreen">
+  <h2 data-i18n="gameOverTitle">😿 游戏<span>结束</span></h2>
+  <p data-i18n="gameOverMsg">球球掉落了！再试一次吧～</p>
+  <button class="btn-play" onclick="retryLevel()" data-i18n="btnRetry">重新挑战</button>
+  <button class="btn-secondary" onclick="goHome()" data-i18n="btnHome2">返回首页</button>
+</div>
+
+<!-- All Clear Screen -->
+<div class="overlay hidden" id="allClearScreen">
+  <h2 data-i18n="allClearTitle">🏆 全部<span>通关</span>！</h2>
+  <p data-i18n="allClearMsg">太厉害了！你完成了全部100关！🎊</p>
+  <button class="btn-play" onclick="goHome()" data-i18n="btnHome3">返回首页</button>
+</div>
+<script>
+// ========== FIREBASE INIT ==========
+const _fc = 'fSJZVk1SSEVEMlJKLUciIDoiZEl0bmVtZXJ1c2FlbSIgLCIzNjI0NjRmMDkwZDU0NDEyYmM1YmVmOmJldzo2MDk2ODE3MTQxODY6MSIgOiJkSXBwYSIgLCI2MDk2ODE3MTQxODYiIDoiZElyZWRuZVNnbmlnYXNzZW0iICwicHBhLmVnYXJvdHNlc2FiZXJpZi5pYS1uZXR0aWstZXR1YyIgOiJ0ZWtjdUJlZ2Fyb3RzIiAsImlhLW5ldHRpay1ldHVjIiA6ImRJdGNlam9ycCIgLCJtb2MucHBhZXNhYmVyaWYuaWEtbmV0dGlrLWV0dWMiIDoibmlhbW9EaHR1YSIgLCJrMzA5YkVGZlZ1a0taMXlBWE10djZ3al9peW9OV3A1d0J5U2F6SUEiIDoieWVLaXBhIns=';
+let db;
+try {
+  const s1 = document.createElement('script');
+  s1.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';
+  const s2 = document.createElement('script');
+  s2.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js';
+  // We'll init firebase after scripts load
+} catch(e) { console.warn('Firebase scripts skipped'); }
+
+function initFirebase() {
+  if (typeof firebase !== 'undefined' && !db) {
+    try {
+      const firebaseConfig = JSON.parse(atob(_fc).split('').reverse().join(''));
+      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+    } catch(e) { console.warn('Firebase init failed:', e); }
+  }
+}
+
+function getUserId() {
+  let uid = localStorage.getItem('ck_uid');
+  if (!uid) {
+    uid = 'u_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+    localStorage.setItem('ck_uid', uid);
+  }
+  return uid;
+}
+
+async function saveGameProgress(level, score) {
+  initFirebase();
+  if (!db) return;
+  const uid = getUserId();
+  try {
+    await db.collection('game_progress').doc(uid).set({
+      currentLevel: level,
+      highestLevel: level,
+      score: score,
+      lastPlayedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
+    // Also update highest level if needed
+    const doc = await db.collection('game_progress').doc(uid).get();
+    if (doc.exists && doc.data().highestLevel < level) {
+      await db.collection('game_progress').doc(uid).set({ highestLevel: level }, { merge: true });
+    }
+  } catch(e) { console.warn('Save progress failed:', e); }
+}
+
+async function loadGameProgress() {
+  initFirebase();
+  if (!db) return null;
+  const uid = getUserId();
+  try {
+    const doc = await db.collection('game_progress').doc(uid).get();
+    if (doc.exists) return doc.data();
+  } catch(e) { console.warn('Load progress failed:', e); }
+  return null;
+}
+
+// ========== LOAD FIREBASE SCRIPTS DYNAMICALLY ==========
+(function loadFirebaseScripts() {
+  const s1 = document.createElement('script');
+  s1.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';
+  s1.onload = function() {
+    const s2 = document.createElement('script');
+    s2.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js';
+    s2.onload = function() { initFirebase(); };
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s1);
+})();
+
+// ========== GAME CONSTANTS & STATE ==========
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const CAT_IMG_SRC = 'data:image/png;base64,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';
+
+let currentLevel = 1;
+let score = 0;
+let lives = 3;
+let gameRunning = false;
+let animFrameId = null;
+
+// Canvas sizing
+const MAX_W = 560, MAX_H = 700;
+function resizeCanvas() {
+  const wrapW = window.innerWidth - 20;
+  const wrapH = window.innerHeight - 66;
+  const scale = Math.min(wrapW / MAX_W, wrapH / MAX_H, 1);
+  canvas.width = Math.floor(MAX_W * scale);
+  canvas.height = Math.floor(MAX_H * scale);
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// ========== GAME OBJECTS ==========
+const BRICK_ROWS_BASE = 4;
+const BRICK_COLS_BASE = 12;
+const BRICK_PAD = 3;
+const POWERUP_FOOD = 1;  // 猫粮 → 10 balls
+const POWERUP_TREAT = 2; // 猫条 → 50 balls
+
+let paddle = { w: 0, h: 0, x: 0, y: 0, speed: 7 };
+let balls = [];
+let bricks = [];
+let walls = [];  // obstacle walls
+let fallingItems = []; // power-up items falling
+let catImg = new Image();
+catImg.src = CAT_IMG_SRC;
+
+// Brick colors pool
+const BRICK_COLORS = [
+  '#ff7eb3','#c9a0ff','#8eb8e8','#ffd97a','#ff6b6b',
+  '#6bdfb8','#f0a0ff','#7eb3ff','#ffb347','#77dd77',
+  '#ff6eb4','#b19cd9','#87ceeb','#ffa07a','#98fb98'
+];
+
+function getLevelConfig(lvl) {
+  const rows = Math.min(BRICK_ROWS_BASE + Math.floor((lvl - 1) / 3), 16);
+  const cols = Math.min(BRICK_COLS_BASE + Math.floor((lvl - 1) / 5), 18);
+  const ballSpeed = 3 + Math.min(lvl * 0.15, 4);
+  const foodChance = Math.max(0.12 - lvl * 0.001, 0.04);
+  const treatChance = Math.max(0.06 - lvl * 0.001, 0.015);
+  return { rows, cols, ballSpeed, foodChance, treatChance };
+}
+
+function initLevel(lvl) {
+  const cw = canvas.width, ch = canvas.height;
+  const cfg = getLevelConfig(lvl);
+
+  // Paddle
+  paddle.w = cw * 0.18;
+  paddle.h = 16;
+  paddle.x = (cw - paddle.w) / 2;
+  paddle.y = ch - 50;
+
+  // Balls
+  balls = [{
+    x: cw / 2, y: paddle.y - 10,
+    dx: cfg.ballSpeed * (Math.random() > 0.5 ? 1 : -1),
+    dy: -cfg.ballSpeed,
+    r: 6, active: true
+  }];
+
+  // Bricks (size shrinks as cols increase)
+  bricks = [];
+  const brickW = (cw - BRICK_PAD * (cfg.cols + 1)) / cfg.cols;
+  const brickH = Math.max(8, 14 - Math.floor(lvl / 10));
+  for (let r = 0; r < cfg.rows; r++) {
+    for (let c = 0; c < cfg.cols; c++) {
+      const rng = Math.random();
+      let powerup = 0;
+      if (rng < cfg.treatChance) powerup = POWERUP_TREAT;
+      else if (rng < cfg.treatChance + cfg.foodChance) powerup = POWERUP_FOOD;
+      bricks.push({
+        x: BRICK_PAD + c * (brickW + BRICK_PAD),
+        y: 50 + r * (brickH + BRICK_PAD),
+        w: brickW, h: brickH,
+        color: BRICK_COLORS[Math.floor(Math.random() * BRICK_COLORS.length)],
+        alive: true, powerup
+      });
+    }
+  }
+
+  // Generate walls: box (口) shape enclosing bricks, bottom has gaps
+  walls = [];
+  const wallT = 8; // wall thickness
+  const boxMargin = 6;
+  const boxLeft = BRICK_PAD - boxMargin;
+  const boxRight = BRICK_PAD + cfg.cols * (brickW + BRICK_PAD) - BRICK_PAD + boxMargin;
+  const boxTop = 50 - boxMargin;
+  const boxBottom = 50 + cfg.rows * (brickH + BRICK_PAD) - BRICK_PAD + boxMargin;
+  const boxW = boxRight - boxLeft;
+  const boxH = boxBottom - boxTop;
+
+  // Top wall
+  walls.push({ x: boxLeft, y: boxTop - wallT, w: boxW, h: wallT });
+  // Left wall (vertical)
+  walls.push({ x: boxLeft - wallT, y: boxTop - wallT, w: wallT, h: boxH + wallT * 2 });
+  // Right wall (vertical)
+  walls.push({ x: boxRight, y: boxTop - wallT, w: wallT, h: boxH + wallT * 2 });
+
+  // Bottom wall with gaps - number of gaps decreases with level
+  const numGaps = Math.max(2, 4 - Math.floor(lvl / 20));
+  // Gap width shrinks with level
+  const gapW = Math.max(boxW * 0.06, boxW * (0.14 - lvl * 0.001));
+  // Distribute gaps evenly along the bottom
+  const segmentW = boxW / (numGaps + 1);
+  const gapPositions = [];
+  for (let g = 0; g < numGaps; g++) {
+    gapPositions.push(boxLeft + segmentW * (g + 1) - gapW / 2);
+  }
+  // Build bottom wall segments around gaps
+  let prevX = boxLeft;
+  for (let g = 0; g < gapPositions.length; g++) {
+    const gx = gapPositions[g];
+    if (gx > prevX) {
+      walls.push({ x: prevX, y: boxBottom, w: gx - prevX, h: wallT });
+    }
+    prevX = gx + gapW;
+  }
+  if (prevX < boxRight) {
+    walls.push({ x: prevX, y: boxBottom, w: boxRight - prevX, h: wallT });
+  }
+
+  fallingItems = [];
+  updateHUD();
+}
+
+function updateHUD() {
+  document.getElementById('levelDisplay').textContent = currentLevel;
+  document.getElementById('scoreDisplay').textContent = score;
+  document.getElementById('ballDisplay').textContent = balls.filter(b => b.active).length;
+}
+
+// ========== INPUT HANDLING ==========
+let keys = {};
+let touchX = null;
+document.addEventListener('keydown', e => { keys[e.key] = true; });
+document.addEventListener('keyup', e => { keys[e.key] = false; });
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  touchX = e.touches[0].clientX;
+}, { passive: false });
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const x = e.touches[0].clientX - rect.left;
+  paddle.x = Math.max(0, Math.min(canvas.width - paddle.w, x - paddle.w / 2));
+  touchX = e.touches[0].clientX;
+}, { passive: false });
+canvas.addEventListener('touchend', () => { touchX = null; });
+// Mouse control disabled on desktop - use keyboard only
+// Touch controls still work on mobile
+
+function handleInput() {
+  const spd = paddle.speed * (canvas.width / MAX_W);
+  if (keys['ArrowLeft'] || keys['a'] || keys['A']) paddle.x = Math.max(0, paddle.x - spd);
+  if (keys['ArrowRight'] || keys['d'] || keys['D']) paddle.x = Math.min(canvas.width - paddle.w, paddle.x + spd);
+}
+
+// ========== POWERUP SPLIT ==========
+function splitBalls(count) {
+  const cfg = getLevelConfig(currentLevel);
+  const activeBalls = balls.filter(b => b.active);
+  if (activeBalls.length === 0) return;
+  const ref = activeBalls[0];
+  for (let i = 0; i < count - 1; i++) {
+    const angle = (Math.PI * 2 * i) / (count - 1);
+    balls.push({
+      x: ref.x, y: ref.y,
+      dx: cfg.ballSpeed * Math.cos(angle),
+      dy: cfg.ballSpeed * Math.sin(angle),
+      r: 6, active: true
+    });
+  }
+  // Ensure at least one goes upward
+  balls.forEach(b => { if (b.active && b.dy > 0 && Math.random() > 0.5) b.dy = -Math.abs(b.dy); });
+  updateHUD();
+}
+
+// ========== GAME LOOP ==========
+function update() {
+  const cw = canvas.width, ch = canvas.height;
+  handleInput();
+
+  // Update balls
+  balls.forEach(ball => {
+    if (!ball.active) return;
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+
+    // Wall collisions
+    if (ball.x - ball.r <= 0) { ball.x = ball.r; ball.dx = Math.abs(ball.dx); }
+    if (ball.x + ball.r >= cw) { ball.x = cw - ball.r; ball.dx = -Math.abs(ball.dx); }
+    if (ball.y - ball.r <= 0) { ball.y = ball.r; ball.dy = Math.abs(ball.dy); }
+
+    // Paddle collision
+    if (ball.dy > 0 && ball.y + ball.r >= paddle.y && ball.y + ball.r <= paddle.y + paddle.h + 4
+      && ball.x >= paddle.x && ball.x <= paddle.x + paddle.w) {
+      ball.dy = -Math.abs(ball.dy);
+      // Angle variation based on hit position
+      const hitPos = (ball.x - paddle.x) / paddle.w; // 0..1
+      const angle = (hitPos - 0.5) * 1.2;
+      const spd = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy);
+      ball.dx = spd * Math.sin(angle);
+      ball.dy = -spd * Math.cos(angle);
+    }
+
+    // Brick collision - only ONE brick per ball per frame
+    let hitBrick = false;
+    for (let i = 0; i < bricks.length; i++) {
+      const brick = bricks[i];
+      if (!brick.alive || hitBrick) continue;
+      if (ball.x + ball.r > brick.x && ball.x - ball.r < brick.x + brick.w
+        && ball.y + ball.r > brick.y && ball.y - ball.r < brick.y + brick.h) {
+        brick.alive = false;
+        // Determine bounce direction
+        const overlapTop = (ball.y + ball.r) - brick.y;
+        const overlapBottom = (brick.y + brick.h) - (ball.y - ball.r);
+        const overlapLeft = (ball.x + ball.r) - brick.x;
+        const overlapRight = (brick.x + brick.w) - (ball.x - ball.r);
+        const minOverlap = Math.min(overlapTop, overlapBottom, overlapLeft, overlapRight);
+        if (minOverlap === overlapTop || minOverlap === overlapBottom) {
+          ball.dy = -ball.dy;
+        } else {
+          ball.dx = -ball.dx;
+        }
+        score += 10;
+        hitBrick = true;
+        // Drop powerup
+        if (brick.powerup) {
+          fallingItems.push({
+            x: brick.x + brick.w / 2, y: brick.y + brick.h,
+            type: brick.powerup, speed: 2, active: true
+          });
+        }
+      }
+    }
+
+    // Wall (obstacle) collision
+    walls.forEach(wall => {
+      if (ball.x + ball.r > wall.x && ball.x - ball.r < wall.x + wall.w
+        && ball.y + ball.r > wall.y && ball.y - ball.r < wall.y + wall.h) {
+        // Determine which side was hit
+        const overlapLeft = (ball.x + ball.r) - wall.x;
+        const overlapRight = (wall.x + wall.w) - (ball.x - ball.r);
+        const overlapTop = (ball.y + ball.r) - wall.y;
+        const overlapBottom = (wall.y + wall.h) - (ball.y - ball.r);
+        const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+        if (minOverlap === overlapTop || minOverlap === overlapBottom) {
+          ball.dy = -ball.dy;
+        } else {
+          ball.dx = -ball.dx;
+        }
+      }
+    });
+
+    // Ball falls off bottom
+    if (ball.y - ball.r > ch) { ball.active = false; }
+  });
+
+  // Update falling items
+  fallingItems.forEach(item => {
+    if (!item.active) return;
+    item.y += item.speed;
+    // Catch with paddle
+    if (item.y >= paddle.y && item.y <= paddle.y + paddle.h + 10
+      && item.x >= paddle.x && item.x <= paddle.x + paddle.w) {
+      item.active = false;
+      if (item.type === POWERUP_FOOD) splitBalls(10);
+      else if (item.type === POWERUP_TREAT) splitBalls(50);
+    }
+    if (item.y > ch) item.active = false;
+  });
+
+  // Check active balls
+  const activeBalls = balls.filter(b => b.active);
+  if (activeBalls.length === 0) {
+    // Game over
+    gameRunning = false;
+    showOverlay('gameOverScreen');
+    return;
+  }
+
+  // Check bricks cleared
+  const aliveBricks = bricks.filter(b => b.alive);
+  if (aliveBricks.length === 0) {
+    gameRunning = false;
+    saveGameProgress(currentLevel, score);
+    if (currentLevel >= 100) {
+      showOverlay('allClearScreen');
+    } else {
+      document.getElementById('completedLevel').textContent = currentLevel;
+      showOverlay('levelCompleteScreen');
+    }
+    return;
+  }
+
+  updateHUD();
+}
+
+function draw() {
+  const cw = canvas.width, ch = canvas.height;
+  ctx.clearRect(0, 0, cw, ch);
+
+  // Draw bricks
+  bricks.forEach(brick => {
+    if (!brick.alive) return;
+    ctx.fillStyle = brick.color;
+    ctx.beginPath();
+    const br = 3;
+    ctx.roundRect(brick.x, brick.y, brick.w, brick.h, br);
+    ctx.fill();
+    // Powerup icons are hidden - surprise when broken!
+  });
+
+  // Draw walls (obstacles)
+  walls.forEach(wall => {
+    ctx.fillStyle = 'rgba(160,130,210,0.5)';
+    ctx.beginPath();
+    ctx.roundRect(wall.x, wall.y, wall.w, wall.h, 4);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(200,170,255,0.6)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Draw paddle + cat
+  // Cat body (paddle)
+  const grad = ctx.createLinearGradient(paddle.x, paddle.y, paddle.x + paddle.w, paddle.y);
+  grad.addColorStop(0, '#ff7eb3'); grad.addColorStop(1, '#c9a0ff');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.roundRect(paddle.x, paddle.y, paddle.w, paddle.h, 8);
+  ctx.fill();
+  ctx.shadowColor = 'rgba(255,126,179,0.5)';
+  ctx.shadowBlur = 12;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Cat image above paddle
+  const catH = 42;
+  const catW = catH * (catImg.naturalWidth / catImg.naturalHeight) || catH * 0.6;
+  if (catImg.complete && catImg.naturalWidth > 0) {
+    ctx.drawImage(catImg, paddle.x + (paddle.w - catW) / 2, paddle.y - catH + 6, catW, catH);
+  }
+
+  // Draw balls
+  balls.forEach(ball => {
+    if (!ball.active) return;
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+    const bGrad = ctx.createRadialGradient(ball.x, ball.y, 0, ball.x, ball.y, ball.r);
+    bGrad.addColorStop(0, '#fff');
+    bGrad.addColorStop(1, '#ffd97a');
+    ctx.fillStyle = bGrad;
+    ctx.shadowColor = 'rgba(255,217,122,0.6)';
+    ctx.shadowBlur = 8;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  });
+
+  // Draw falling items
+  fallingItems.forEach(item => {
+    if (!item.active) return;
+    ctx.font = '20px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(item.type === POWERUP_FOOD ? '🐟' : '🍖', item.x, item.y);
+  });
+}
+
+function gameLoop() {
+  if (!gameRunning) return;
+  update();
+  if (gameRunning) draw();
+  animFrameId = requestAnimationFrame(gameLoop);
+}
+
+// ========== SCREEN MANAGEMENT ==========
+function showOverlay(id) {
+  ['startScreen','levelCompleteScreen','gameOverScreen','allClearScreen'].forEach(s => {
+    document.getElementById(s).classList.add('hidden');
+  });
+  document.getElementById(id).classList.remove('hidden');
+  // Re-apply language to ensure overlays are translated
+  const lang = localStorage.getItem('ck_lang') || 'zh';
+  setLang(lang);
+}
+
+function hideAllOverlays() {
+  ['startScreen','levelCompleteScreen','gameOverScreen','allClearScreen'].forEach(s => {
+    document.getElementById(s).classList.add('hidden');
+  });
+}
+
+function startGame() {
+  currentLevel = 1; score = 0;
+  // Try to load saved progress
+  loadGameProgress().then(data => {
+    if (data && data.highestLevel > 1) {
+      currentLevel = data.highestLevel;
+      score = data.score || 0;
+    }
+    hideAllOverlays();
+    initLevel(currentLevel);
+    gameRunning = true;
+    gameLoop();
+  }).catch(() => {
+    hideAllOverlays();
+    initLevel(currentLevel);
+    gameRunning = true;
+    gameLoop();
+  });
+}
+
+function nextLevel() {
+  currentLevel++;
+  hideAllOverlays();
+  initLevel(currentLevel);
+  gameRunning = true;
+  gameLoop();
+}
+
+function retryLevel() {
+  hideAllOverlays();
+  initLevel(currentLevel);
+  gameRunning = true;
+  gameLoop();
+}
+
+function goHome() {
+  window.location.href = 'index.html';
+}
+
+// Polyfill roundRect if needed
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+    if (typeof r === 'number') r = [r];
+    const rad = r[0] || 0;
+    this.moveTo(x + rad, y);
+    this.lineTo(x + w - rad, y);
+    this.quadraticCurveTo(x + w, y, x + w, y + rad);
+    this.lineTo(x + w, y + h - rad);
+    this.quadraticCurveTo(x + w, y + h, x + w - rad, y + h);
+    this.lineTo(x + rad, y + h);
+    this.quadraticCurveTo(x, y + h, x, y + h - rad);
+    this.lineTo(x, y + rad);
+    this.quadraticCurveTo(x, y, x + rad, y);
+    this.closePath();
+  };
+}
+// ========== i18n LANGUAGE SWITCHING ==========
+// ========== i18n LANGUAGE SWITCHING ==========
+const CAT_ICON_B64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAYCAYAAADKx8xXAAAElUlEQVR42oWUa2yTdRjFz/P/v5du7GK3whhsMnaB3bIJTBkrMAMSgjjUyWYYZJkQlMTMBDEmqFBriEFiiIhEEAiCNygqfsCQoMYLSsZkyG0bbKPb2NZdu1G7lrV9+z5+QAzfPJ9Pzjlfzg+1y1bu2PRUzYcALADALpYOQOB/JOL05B57Vl39x1v3/VFXaa+gaoo6QabD4VAA0INmh8MhXFVVEgCwrmLRkn1130fdv9zhvtttvHPLW65pwCwAEEKivLxccQDC5XLJBzIIpaUJ2e/VHPLf/NUTZWaj4UgHf/TyId/br2/cen/+/eLnFpct2ly3+iUAkL29odEny1bULVu7yBalABpOus2s3PyYms2rl2bZ0ipM77A/6Osz16+prNn4QuUXaanJqzpvDR5XilKshUn5xl39IQXupjvwD03I9OIwq3qcWZL7dHHoidHPX9u+IZpgiZeit4mFTOAFZXMXKvWvrL9gmyxjg/4grp/pF6pFxYw5SQRAXm28aqZlW7m4qFj6fAFzzDfVtABKQnx8skibZtON4dv46XALhjr8SCuOx/S8VPS2DcA7fkkUlGRK7/AYGxFD2HJLJBKnY6C7q1tMRNHOYeauxkEzPW867DX56OnqxLkfv8KSVblQhA4QEcAwzSiEqiEaDUMWZs5MLJxXsNTd4eEM+yS63XcFXdcvYO6cbMRNikcoHIKqqgAA0zRNa2KCGBoaZflzw6XLy8vLKpY8Mzsl4O8xbfEa5RfOBrNAOByGoqoIjgdAUkCQpJhYnUa8Q0kCgH/EO/pXyuRpyMrKYastGR0dXQgGxqGqKgxjAhebGuG+dhO6ytTROoDmxpEUAYCMcCQQmphgk6M8MuhF27WbCAYm4BkcxJ8NPUiw5CESScbZ77pMf1BlgH0KAB4YHLphGAYxCVgiEvbsIlhSbBjz+ZCcLKApErFWBTNzbcLEOChu5F1JRGCfbzhnduaGjIx0XcaooESNjKiBGE3HlNRJsNosSIyLMYe9/d4Pdh/cv+ez007pqqqS7/92fmzXtjdHo1FjxXgwCEtsLGmaBmZGJGJCVXTuaO+iY0eOt66rrS4qyEybJQCAiDhssru09FGZZLWi/UY7mBkgQAqCYRg0NXUK7di5reSR4oKcwPh4SJ5saVHf2LT21fbOriEC+fML8+Zl52RRJBIhIgKIwGxC13U+f64htP+TY1t3Hz31jgLAWjp/7q7KZ1d47cvXPf/l9NSV5YvtD5sms5SCAICZWVUUUjUNB785e5SITAlCIDlW7368vGzNsvL5tTEWS8zkFJs0jCgR/fdFEkKyxaKpPk/fmWu3eroVx3aHcDqdn0buhkz7wsf2zsrNSTAMg5n5X2wwmO/1CiIiIQQAFk6n03S5quSBU2eP1W7ZsaCvr9+jaSpLRZqaprOm6awo0lSkoN6+/sDlq+42IrpHs+rqk9E9e+p1AC0Xm64ckETC7/tb9Hs8NODpJ9+YT2iqSud/v3Cg2ePpOXHihFTu02d0dG/EAYiW9ltff3/6h/rm662HOjvd5wAgfUZG2Zzighdbb7QdBkDNzc38D3YsCUDmHxWPAAAAAElFTkSuQmCC';
+const catIconTag = '<img src="' + CAT_ICON_B64 + '" alt="cat" style="height:20px;vertical-align:middle;margin-right:4px;">';
+const catIconTagLg = '<img src="' + CAT_ICON_B64 + '" alt="cat" style="height:36px;vertical-align:-8px;margin-right:6px;">';
+
+const i18nDict = {
+  zh: {
+    backBtn: '← 返回首页',
+    statLevel: '关卡',
+    statScore: '分数',
+    statBall: '球',
+    topBarTitle: catIconTag + ' 猫猫<span>接球</span>',
+    gameTitle: '猫猫<span>接球</span>',
+    gameDesc: '操控猫猫举着板子接住弹球，击碎所有砖块！<br>砖块里藏着猫粮和猫条哦～',
+    powerupFood: '猫粮 → 裂变10球',
+    powerupTreat: '猫条 → 裂变50球',
+    btnStart: '开始游戏 🎮',
+    levelCompleteMsg: '准备好迎接下一关了吗？',
+    btnNextLevel: '进入下一关 →',
+    btnHome: '返回首页',
+    btnHome2: '返回首页',
+    btnHome3: '返回首页',
+    gameOverTitle: '<img src="' + CAT_ICON_B64 + '" alt="cat" style="height:28px;vertical-align:middle;margin-right:4px;"> 游戏<span>结束</span>',
+    gameOverMsg: '球球掉落了！再试一次吧～',
+    btnRetry: '重新挑战',
+    allClearTitle: '🏆 全部<span>通关</span>！',
+    allClearMsg: '太厉害了！你完成了全部100关！🎊'
+  },
+  en: {
+    backBtn: '← Back',
+    statLevel: 'Level',
+    statScore: 'Score',
+    statBall: 'Ball',
+    topBarTitle: catIconTag + ' Kitten <span>Breakout</span>',
+    gameTitle: 'Kitten <span>Breakout</span>',
+    gameDesc: 'Move the kitten to catch the ball and break all the bricks!<br>Some bricks contain cat food and treats~',
+    powerupFood: 'Cat Food → Split into 10',
+    powerupTreat: 'Cat Treat → Split into 50',
+    btnStart: 'Start Game 🎮',
+    levelCompleteMsg: 'Ready for the next level?',
+    btnNextLevel: 'Next Level →',
+    btnHome: 'Home',
+    btnHome2: 'Home',
+    btnHome3: 'Home',
+    gameOverTitle: '<img src="' + CAT_ICON_B64 + '" alt="cat" style="height:28px;vertical-align:middle;margin-right:4px;"> Game <span>Over</span>',
+    gameOverMsg: 'The ball fell! Try again~',
+    btnRetry: 'Retry',
+    allClearTitle: '🏆 All <span>Clear</span>!',
+    allClearMsg: 'Amazing! You completed all 100 levels! 🎊'
+  }
+};
+
+function setLang(lang) {
+  if (!lang) lang = 'zh';
+  localStorage.setItem('ck_lang', lang);
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  // Update lang buttons
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', (btn.textContent.trim() === '中文' && lang === 'zh') || (btn.textContent.trim() === 'EN' && lang === 'en'));
+  });
+  // Apply translations
+  const dict = i18nDict[lang] || i18nDict.zh;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key] !== undefined) {
+      el.innerHTML = dict[key];
+    }
+  });
+  // Update level complete title dynamically (contains current level number)
+  const lcTitle = document.querySelector('#levelCompleteScreen h2');
+  if (lcTitle) {
+    const lvl = currentLevel;
+    if (lang === 'en') {
+      lcTitle.innerHTML = '🎉 Level <span><span id="completedLevel">' + lvl + '</span> Cleared</span>!';
+    } else {
+      lcTitle.innerHTML = '🎉 恭喜通过<span>第 <span id="completedLevel">' + lvl + '</span> 关</span>！';
+    }
+  }
+  // Update start screen h2 (contains cat icon image)
+  const startH2 = document.querySelector('#startScreen h2');
+  if (startH2) {
+    startH2.innerHTML = catIconTagLg + ' <span data-i18n="gameTitle">' + dict.gameTitle + '</span>';
+  }
+  // Update page title
+  document.title = lang === 'en' ? 'Kitten Breakout - Cute Kitten' : '猫猫接球 - Cute Kitten';
+}
+
+// Init language from localStorage (synced with main page)
+(function initLang() {
+  const lang = localStorage.getItem('ck_lang') || 'zh';
+  setLang(lang);
+})();
+
+</script>
+</body>
+</html>
